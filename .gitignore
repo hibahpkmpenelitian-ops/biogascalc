@@ -27,3 +27,8 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+
+# Claude
+CLAUDE.md
+DESIGN.md
+SKILL.md

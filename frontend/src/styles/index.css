@@ -1,0 +1,1015 @@
+/* BioGasCalc — index.css
+   Design tokens dari DESIGN.md (MongoDB-style visual system).
+   Euclid Circular A tidak tersedia di Google Fonts — diimport via Plus Jakarta Sans
+   sebagai substitusi terdekat. Jika Euclid Circular A di-host sendiri nanti,
+   tambahkan @font-face di atas dan ia akan diprioritaskan lewat font stack.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Source+Code+Pro:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS — Tailwind v4 @theme block
+   Semua nilai di sini otomatis jadi utility class Tailwind.
+   Contoh: --color-brand-green → bg-brand-green, text-brand-green
+   ============================================================ */
+
+@theme {
+
+  /* ----------------------------------------------------------
+     SPACING SCALE BASE — required by Tailwind v4 numeric utilities
+     (p-4, mt-24, gap-6, etc. all compute as calc(var(--spacing) * N))
+     ---------------------------------------------------------- */
+  --spacing: 0.25rem;
+
+  /* ----------------------------------------------------------
+     COLORS — Brand Green (Primary CTA)
+     ---------------------------------------------------------- */
+  --color-brand-green:       #00ed64;
+  --color-brand-green-dark:  #00684a;
+  --color-brand-green-mid:   #00a35c;
+  --color-brand-green-soft:  #c3f0d2;
+
+  /* Primary aliases */
+  --color-primary:           #00ed64;
+  --color-primary-deep:      #00b545;
+  --color-primary-pressed:   #008c34;
+  --color-on-primary:        #001e2b;
+
+  /* ----------------------------------------------------------
+     COLORS — Brand Teal (Hero bands, footer, dark surfaces)
+     ---------------------------------------------------------- */
+  --color-brand-teal-deep:   #001e2b;
+  --color-brand-teal:        #003d4f;
+  --color-brand-teal-mid:    #00684a;
+
+  /* ----------------------------------------------------------
+     COLORS — Category Accents (HANYA untuk course/tag badges)
+     ---------------------------------------------------------- */
+  --color-accent-purple:     #7b3ff2;
+  --color-accent-orange:     #fa6e39;
+  --color-accent-pink:       #f06bb8;
+  --color-accent-blue:       #3d4f9f;
+
+  /* ----------------------------------------------------------
+     COLORS — Semantic States
+     ---------------------------------------------------------- */
+  --color-warning-bg:        #fff8e0;
+  --color-warning-text:      #946f3f;
+
+  /* ----------------------------------------------------------
+     COLORS — Surface (Latar belakang halaman & kartu)
+     ---------------------------------------------------------- */
+  --color-canvas:            #ffffff;
+  --color-canvas-dark:       #001e2b;
+  --color-surface:           #f9fbfa;
+  --color-surface-soft:      #f4f7f6;
+  --color-surface-feature:   #e3fcef;
+
+  /* ----------------------------------------------------------
+     COLORS — Hairline / Border
+     ---------------------------------------------------------- */
+  --color-hairline:          #e1e5e8;
+  --color-hairline-soft:     #eceff1;
+  --color-hairline-strong:   #c1ccd6;
+  --color-hairline-dark:     #1c2d38;
+
+  /* ----------------------------------------------------------
+     COLORS — Text Hierarchy
+     ---------------------------------------------------------- */
+  --color-ink:               #001e2b;
+  --color-charcoal:          #1c2d38;
+  --color-slate:             #3d4f5b;
+  --color-steel:             #5c6c7a;
+  --color-stone:             #7c8c9a;
+  --color-muted:             #a8b3bc;
+  --color-on-dark:           #ffffff;
+  --color-on-dark-muted:     #a8b3bc;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Font Families
+     "Euclid Circular A" didahulukan; Plus Jakarta Sans sebagai
+     Google-Fonts fallback dengan karakter geometric yang serupa.
+     ---------------------------------------------------------- */
+  --font-display: 'Euclid Circular A', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body:    'Euclid Circular A', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:    'Source Code Pro', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Font Sizes (sesuai DESIGN.md type scale)
+     ---------------------------------------------------------- */
+  --text-micro:    0.6875rem;   /* 11px  — micro-uppercase eyebrow */
+  --text-caption:  0.8125rem;   /* 13px  — caption, badge label     */
+  --text-sm:       0.875rem;    /* 14px  — body-sm, button-md       */
+  --text-base:     1rem;        /* 16px  — body-md (primary body)   */
+  --text-lg:       1.125rem;    /* 18px  — heading-5, subtitle      */
+  --text-xl:       1.375rem;    /* 22px  — heading-4                */
+  --text-2xl:      1.75rem;     /* 28px  — heading-3                */
+  --text-3xl:      2.25rem;     /* 36px  — heading-2                */
+  --text-4xl:      3rem;        /* 48px  — heading-1                */
+  --text-5xl:      3.5rem;      /* 56px  — display-lg               */
+  --text-6xl:      4.5rem;      /* 72px  — hero-display             */
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Line Heights
+     ---------------------------------------------------------- */
+  --leading-hero:    1.10;   /* hero-display 72px                  */
+  --leading-display: 1.15;   /* display-lg 56px                    */
+  --leading-tight:   1.20;   /* heading-1                          */
+  --leading-snug:    1.25;   /* heading-2                          */
+  --leading-card:    1.30;   /* heading-3, button                  */
+  --leading-normal:  1.55;   /* body-md — generous for readability */
+  --leading-relaxed: 1.50;   /* body-sm, subtitle                  */
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — Font Weights
+     ---------------------------------------------------------- */
+  --font-weight-regular:   400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+
+  /* ----------------------------------------------------------
+     SPACING — 4px base grid (sesuai DESIGN.md)
+     ---------------------------------------------------------- */
+  --spacing-xxs:        0.25rem;    /*   4px */
+  --spacing-xs:         0.5rem;     /*   8px */
+  --spacing-sm:         0.75rem;    /*  12px */
+  --spacing-md:         1rem;       /*  16px */
+  --spacing-lg:         1.25rem;    /*  20px */
+  --spacing-xl:         1.5rem;     /*  24px */
+  --spacing-xxl:        2rem;       /*  32px */
+  --spacing-xxxl:       2.5rem;     /*  40px */
+  --spacing-section-sm: 3rem;       /*  48px */
+  --spacing-section:    4rem;       /*  64px */
+  --spacing-section-lg: 6rem;       /*  96px */
+  --spacing-hero:       7.5rem;     /* 120px */
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS (sesuai DESIGN.md rounded scale)
+     ---------------------------------------------------------- */
+  --radius-xs:   0.25rem;   /*    4px — course category tags        */
+  --radius-sm:   0.375rem;  /*    6px — type badges, code chips      */
+  --radius-md:   0.5rem;    /*    8px — inputs, search, code blocks  */
+  --radius-lg:   0.75rem;   /*   12px — cards, pricing tiers         */
+  --radius-xl:   1rem;      /*   16px — larger feature panels        */
+  --radius-xxl:  1.5rem;    /*   24px — featured product showcases   */
+  --radius-full: 9999px;    /* pill  — SEMUA button & status badge   */
+
+  /* ----------------------------------------------------------
+     ELEVATION / SHADOWS (sesuai DESIGN.md 5-level system)
+     ---------------------------------------------------------- */
+  --shadow-0: none;
+  --shadow-1: rgba(0, 30, 43, 0.04) 0px 1px 2px 0px;
+  --shadow-2: rgba(0, 30, 43, 0.08) 0px 4px 12px 0px;
+  --shadow-3: rgba(0, 30, 43, 0.12) 0px 12px 24px -4px;
+  --shadow-4: rgba(0, 30, 43, 0.16) 0px 16px 48px -8px;
+
+  /* ----------------------------------------------------------
+     TRANSITIONS
+     ---------------------------------------------------------- */
+  --duration-fast:   150ms;
+  --duration-normal: 200ms;
+  --duration-slow:   350ms;
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:        cubic-bezier(0, 0, 0.2, 1);
+
+}
+
+/* ============================================================
+   SEMANTIC ALIASES — shorthand kontekstual via var().
+   Tidak masuk @theme karena bukan token primitif.
+   Bisa dipakai di CSS component: var(--bg-surface), dll.
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg-base:      var(--color-surface);
+  --bg-surface:   var(--color-canvas);
+  --bg-muted:     var(--color-surface-soft);
+  --bg-dark:      var(--color-brand-teal-deep);
+  --bg-feature:   var(--color-surface-feature);
+  --bg-page:      var(--color-canvas);
+
+  /* Text */
+  --text-primary-color:   var(--color-ink);
+  --text-secondary-color: var(--color-slate);
+  --text-muted-color:     var(--color-stone);
+  --text-placeholder:     var(--color-muted);
+  --text-inverse-color:   var(--color-on-dark);
+  --text-brand-color:     var(--color-brand-green-dark);
+
+  /* Borders */
+  --border-default: var(--color-hairline);
+  --border-strong:  var(--color-hairline-strong);
+  --border-brand:   var(--color-brand-green);
+  --border-dark:    var(--color-hairline-dark);
+}
+
+/* ============================================================
+   BASE RESET & GLOBAL STYLES
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary-color);
+  background-color: var(--color-canvas);
+  min-height: 100vh;
+}
+
+/* ============================================================
+   TYPOGRAPHY BASE
+   Semua heading pakai font-body (Euclid Circular A) —
+   MongoDB tidak memisahkan display face dari body face.
+   ============================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+}
+
+h1 {
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: var(--text-3xl);
+  line-height: var(--leading-snug);
+  letter-spacing: -0.5px;
+}
+
+h3 {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-card);
+}
+
+h4 {
+  font-size: var(--text-xl);
+  line-height: 1.35;
+}
+
+h5 {
+  font-size: var(--text-lg);
+  line-height: 1.40;
+  font-weight: var(--font-weight-semibold);
+}
+
+h6 {
+  font-size: var(--text-base);
+  line-height: 1.40;
+  font-weight: var(--font-weight-semibold);
+}
+
+p {
+  color: var(--text-secondary-color);
+  line-height: var(--leading-normal);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* Angka dan output data */
+data,
+output,
+.numeric {
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   ELEMENT BASE
+   ============================================================ */
+
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-card);
+  border: none;
+  background: none;
+}
+
+/* Focus ring — tidak boleh dihapus, penting untuk accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-brand-green-dark);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* ============================================================
+   LAYOUT UTILITIES
+   Container: 1280px max-width, 32px gutters (sesuai DESIGN.md)
+   ============================================================ */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--spacing-xxl);
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding-inline: var(--spacing-md);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    padding-inline: var(--spacing-xxl);
+  }
+}
+
+/* ============================================================
+   COMPONENT UTILITY CLASSES
+   Semua class di bawah merefleksikan komponen dalam DESIGN.md
+   secara 1:1 — token name → CSS value langsung dari frontmatter.
+   ============================================================ */
+
+/* ── Buttons ────────────────────────────────────────────────
+   Semua button pakai rounded.full (pill) — brand signature.
+   ---------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-card);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-default),
+    color            var(--duration-fast) var(--ease-default),
+    border-color     var(--duration-fast) var(--ease-default),
+    box-shadow       var(--duration-fast) var(--ease-default);
+}
+
+/* button-primary — bright MongoDB green pill CTA */
+.btn-primary {
+  background-color: var(--color-brand-green);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-full);
+  padding: 10px 22px;
+  min-height: 40px;
+}
+.btn-primary:active {
+  background-color: var(--color-primary-pressed);
+}
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background-color: var(--color-hairline);
+  color: var(--color-muted);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* button-secondary — outlined pill, light surfaces */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-full);
+  padding: 10px 22px;
+  min-height: 40px;
+}
+
+/* button-on-dark — bright green pill on dark hero bands */
+.btn-on-dark {
+  background-color: var(--color-brand-green);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-full);
+  padding: 10px 22px;
+  min-height: 40px;
+}
+
+/* button-secondary-on-dark — outlined pill on dark surfaces */
+.btn-secondary-on-dark {
+  background-color: transparent;
+  color: var(--color-on-dark);
+  border: 1px solid var(--color-hairline-dark);
+  border-radius: var(--radius-full);
+  padding: 10px 22px;
+  min-height: 40px;
+}
+
+/* button-ghost — quiet rectangular ghost */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  min-height: 36px;
+}
+
+/* button-link — inline green text link */
+.btn-link {
+  background-color: transparent;
+  color: var(--color-brand-green-dark);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  padding: 0;
+  border-radius: 0;
+  min-height: unset;
+}
+
+/* ── Cards ──────────────────────────────────────────────────
+   Semua card pakai rounded.lg (12px) — konsisten.
+   ---------------------------------------------------------- */
+
+/* card-base */
+.card {
+  background-color: var(--color-canvas);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-hairline);
+}
+
+/* card-feature / card-product-deploy / card-course / card-cert / pricing-card */
+.card-feature {
+  background-color: var(--color-canvas);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xxl);
+  border: 1px solid var(--color-hairline);
+}
+
+/* card-feature-dark */
+.card-dark {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xxl);
+}
+
+/* pricing-card-featured — mint background + green border */
+.card-pricing-featured {
+  background-color: var(--color-surface-feature);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xxl);
+  border: 2px solid var(--color-brand-green);
+}
+
+/* why-card — surface background, no border */
+.card-why {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+/* hero-platform-card — lighter teal on dark hero */
+.card-platform {
+  background-color: var(--color-brand-teal-mid);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xxl);
+}
+
+/* ── Badges ─────────────────────────────────────────────────
+   Selalu pakai font-weight semibold 13px (caption-bold).
+   ---------------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.40;
+}
+
+/* badge-green — solid brand-green */
+.badge-green {
+  background-color: var(--color-brand-green);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+/* badge-green-soft — pale mint pill */
+.badge-green-soft {
+  background-color: var(--color-brand-green-soft);
+  color: var(--color-brand-green-dark);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+}
+
+/* badge-popular — dark teal + green text */
+.badge-popular {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-brand-green);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+}
+
+/* badge-purple / badge-orange — category course tags only */
+.badge-purple {
+  background-color: var(--color-accent-purple);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.badge-orange {
+  background-color: var(--color-accent-orange);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.badge-pink {
+  background-color: var(--color-accent-pink);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.badge-blue {
+  background-color: var(--color-accent-blue);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+/* ── Pill Tabs ───────────────────────────────────────────── */
+
+.pill-tab {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  color: var(--color-steel);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-hairline);
+  cursor: pointer;
+  min-height: 32px;
+  transition:
+    background-color var(--duration-fast) var(--ease-default),
+    color            var(--duration-fast) var(--ease-default),
+    border-color     var(--duration-fast) var(--ease-default);
+}
+
+.pill-tab-active,
+.pill-tab[aria-selected="true"] {
+  background-color: var(--color-ink);
+  color: var(--color-on-dark);
+  border-color: var(--color-ink);
+}
+
+/* Segmented (underline-style) tabs */
+.seg-tab {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  color: var(--color-steel);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    color        var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default);
+}
+
+.seg-tab-active,
+.seg-tab[aria-selected="true"] {
+  color: var(--color-brand-green-dark);
+  border-bottom-color: var(--color-brand-green-dark);
+}
+
+/* ── Inputs & Forms ─────────────────────────────────────── */
+
+.input {
+  display: block;
+  width: 100%;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  height: 44px;
+  transition: border-color var(--duration-fast) var(--ease-default);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-width: 2px;
+  border-color: var(--color-brand-green-dark);
+}
+
+/* search-pill — 44px standard */
+.search-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-surface);
+  color: var(--color-steel);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  height: 44px;
+}
+
+/* search-pill-large — 56px (top of catalog) */
+.search-pill-large {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-canvas);
+  color: var(--color-steel);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  height: 56px;
+}
+
+/* ── Navigation ─────────────────────────────────────────── */
+
+/* Top nav — sticky white bar */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-canvas);
+  border-bottom: 1px solid var(--color-hairline);
+  height: 64px;
+}
+
+/* Promo banner — full-width dark teal strip above nav */
+.promo-banner {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-on-dark);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+}
+
+/* ── Signature Sections ─────────────────────────────────── */
+
+/* hero-band-dark — deep teal full-bleed hero band */
+.hero-band {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-on-dark);
+  padding-block: var(--spacing-hero);
+}
+
+/* cta-banner-dark — dark CTA at bottom of feature pages */
+.cta-banner {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-section);
+}
+
+/* ── Code ───────────────────────────────────────────────── */
+
+/* code-block */
+.code-block {
+  background-color: var(--color-canvas-dark);
+  color: var(--color-on-dark);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  overflow-x: auto;
+}
+
+/* code-mockup-card — terminal-aesthetic card on hero band */
+.code-mockup-card {
+  background-color: var(--color-canvas-dark);
+  color: var(--color-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-3);
+}
+
+/* ── Tables ─────────────────────────────────────────────── */
+
+.comparison-table {
+  width: 100%;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline);
+  border-collapse: collapse;
+}
+
+.comparison-row {
+  background-color: var(--color-canvas);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-hairline-soft);
+}
+
+/* ── FAQ Accordion ──────────────────────────────────────── */
+
+.faq-item {
+  background-color: var(--color-canvas);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+/* ── Testimonials / Logo Wall ───────────────────────────── */
+
+.testimonial-card {
+  background-color: var(--color-canvas);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xxl);
+  border: 1px solid var(--color-hairline);
+}
+
+.logo-wall-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-steel);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-lg);
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+
+.footer {
+  background-color: var(--color-brand-teal-deep);
+  color: var(--color-on-dark);
+  padding: var(--spacing-section) var(--spacing-xxl);
+}
+
+.footer-link {
+  color: var(--color-on-dark-muted);
+  font-size: var(--text-sm);
+  padding: var(--spacing-xxs) 0;
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-default);
+  display: block;
+}
+
+/* ── Typography Utility Classes ─────────────────────────── */
+
+.text-hero-display {
+  font-size: var(--text-6xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-hero);
+  letter-spacing: -1.5px;
+}
+
+.text-display-lg {
+  font-size: var(--text-5xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-display);
+  letter-spacing: -1px;
+}
+
+.text-heading-1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.5px;
+}
+
+.text-heading-2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  letter-spacing: -0.5px;
+}
+
+.text-heading-3 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-card);
+}
+
+.text-heading-4 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.35;
+}
+
+.text-heading-5 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.40;
+}
+
+.text-subtitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-relaxed);
+}
+
+.text-body-md {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+}
+
+.text-body-sm {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-relaxed);
+}
+
+.text-body-sm-medium {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-relaxed);
+}
+
+.text-caption {
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.40;
+}
+
+.text-caption-bold {
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.40;
+}
+
+.text-micro {
+  font-size: 0.75rem; /* 12px */
+  font-weight: var(--font-weight-medium);
+  line-height: 1.40;
+}
+
+.text-micro-uppercase {
+  font-size: var(--text-micro);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.40;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.text-button {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-card);
+}
+
+/* ============================================================
+   SITE FRAME — sembunyikan scrollbar bawaan agar bezel tidak
+   tertutup, scroll tetap berfungsi via wheel/touch/keyboard
+   ============================================================ */
+
+.site-frame-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.site-frame-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   LEAFLET OVERRIDES — sesuaikan popup dengan design system
+   ============================================================ */
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  border: 1px solid #e1e5e8 !important;
+  box-shadow: rgba(0, 30, 43, 0.12) 0px 12px 24px -4px !important;
+  padding: 0 !important;
+  font-family: 'Euclid Circular A', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+}
+
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-tip-container {
+  filter: drop-shadow(0 2px 2px rgba(0, 30, 43, 0.08));
+}
+
+.leaflet-control-attribution {
+  font-family: 'Euclid Circular A', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 11px !important;
+  color: #a8b3bc !important;
+  background: rgba(255,255,255,0.85) !important;
+  backdrop-filter: blur(4px);
+}
+
+.leaflet-control-attribution a {
+  color: #5c6c7a !important;
+}
+
+.leaflet-control-zoom a {
+  font-family: inherit !important;
+  color: #001e2b !important;
+  border-color: #e1e5e8 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f9fbfa !important;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-out) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out) forwards;
+}
+
+.animate-skeleton {
+  animation: skeletonPulse 1.5s var(--ease-default) infinite;
+}
+
+/* ============================================================
+   REDUCED MOTION — Accessibility
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
