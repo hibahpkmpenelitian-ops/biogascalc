@@ -10,10 +10,21 @@
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "build:frontend": "cd frontend && npm run build"
   },
-  "keywords": ["biogas", "calculator", "mern"],
+  "keywords": [
+    "biogas",
+    "calculator",
+    "mern"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "playwright": "^1.61.0"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "react": "^19.0.0-rc.1",
+    "react-dom": "^19.0.0-rc.1",
+    "react-leaflet": "^5.0.0-rc.2"
   }
 }
