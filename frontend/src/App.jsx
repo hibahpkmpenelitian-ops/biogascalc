@@ -12,7 +12,7 @@ function App() {
       <SiteFrame>
         <div className="flex flex-col min-h-full" style={{ backgroundColor: "#ffffff", overflowX: "hidden" }}>
           <Navbar />
-          <main id="main-content" className="flex-1">
+          <main id="main-content" className="flex-1 main-content-offset">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/lokasi" element={<Location />} />

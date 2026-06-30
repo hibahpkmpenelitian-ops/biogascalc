@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 /* ── Link columns ─────────────────────────────────────────── */
@@ -31,148 +32,165 @@ const COLUMNS = [
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const cardRef = useRef(null);
+  const [halfCardHeight, setHalfCardHeight] = useState(0);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    const update = () => setHalfCardHeight(el.getBoundingClientRect().height / 2);
+    update();
+
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <footer style={{ position: "relative", backgroundColor: "#141414" }}>
 
-      {/* ── CTA card — sits in normal flow, pulled down over the green body below ── */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          width: "100%",
-          maxWidth: 1024,
-          margin: "0 auto",
-          paddingTop: 96,
-          marginBottom: -56,
-        }}
-      >
+      {/* ── CTA card — overlap 50/50 pas di garis hijau, tinggi card otomatis (absolute + translateY -50%) ── */}
+      <div style={{ position: "relative", height: 0 }}>
         <div
+          ref={cardRef}
           style={{
-            position: "relative",
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1,
             width: "100%",
-            borderRadius: 24,
-            overflow: "hidden",
-            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)",
+            maxWidth: 1024,
           }}
         >
           <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: "url(/hero-bg.png)",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "150%",
-              filter: "brightness(1.5) blur(4px)",
-              transform: "scale(1.25)",
-            }}
-          />
-          <div
             style={{
               position: "relative",
-              zIndex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
-              padding: "clamp(40px, 10vw, 96px) clamp(20px, 6vw, 48px)",
+              width: "100%",
+              borderRadius: 24,
+              overflow: "hidden",
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)",
             }}
           >
-            <h2
+            <div
+              aria-hidden="true"
               style={{
-                fontSize: "clamp(1.75rem, 6vw, 3.75rem)",
-                color: "#000000",
-                fontWeight: 500,
-                letterSpacing: "-0.025em",
-                lineHeight: 1.15,
-                maxWidth: 672,
-                marginBottom: "clamp(24px, 5vw, 56px)",
+                position: "absolute",
+                inset: 0,
+                backgroundImage: "url(/hero-bg.png)",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "150%",
+                filter: "brightness(1.5) blur(4px)",
+                transform: "scale(1.25)",
               }}
-            >
-              Mulai hitung potensi biogas Anda hari ini
-            </h2>
-
-            <form
-              onSubmit={(e) => e.preventDefault()}
+            />
+            <div
               style={{
+                position: "relative",
+                zIndex: 1,
                 display: "flex",
-                flexWrap: "wrap",
+                flexDirection: "column",
                 alignItems: "center",
-                width: "100%",
-                maxWidth: 448,
-                backgroundColor: "#ffffff",
-                borderRadius: 12,
-                padding: 6,
-                boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-                gap: 6,
+                textAlign: "center",
+                padding: "clamp(40px, 10vw, 96px) clamp(20px, 6vw, 48px)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", flex: "1 1 180px", minWidth: 0 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#737373", marginLeft: 12, flexShrink: 0 }} aria-hidden="true">
-                  <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                </svg>
-                <input
-                  type="email"
-                  placeholder="Masukkan email Anda"
-                  aria-label="Alamat email"
-                  required
-                  style={{
-                    flex: 1,
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "0.875rem",
-                    background: "transparent",
-                    color: "#171717",
-                    border: "none",
-                    outline: "none",
-                    minWidth: 0,
-                  }}
-                />
-              </div>
-              <button
-                type="submit"
+              <h2
+                style={{
+                  fontSize: "clamp(1.75rem, 6vw, 3.75rem)",
+                  color: "#000000",
+                  fontWeight: 500,
+                  letterSpacing: "-0.025em",
+                  lineHeight: 1.15,
+                  maxWidth: 672,
+                  marginBottom: "clamp(24px, 5vw, 56px)",
+                }}
+              >
+                Mulai hitung potensi biogas Anda hari ini
+              </h2>
+
+              <form
+                onSubmit={(e) => e.preventDefault()}
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
                   alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  padding: "10px 20px",
-                  backgroundColor: "#171717",
-                  color: "#fafafa",
-                  borderRadius: 8,
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  border: "none",
-                  whiteSpace: "nowrap",
-                  cursor: "pointer",
-                  transition: "background-color 0.15s",
-                  flex: "0 1 auto",
+                  width: "100%",
+                  maxWidth: 448,
+                  backgroundColor: "#ffffff",
+                  borderRadius: 12,
+                  padding: 6,
+                  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                  gap: 6,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#262626"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#171717"; }}
               >
-                Gabung Waitlist
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </button>
-            </form>
+                <div style={{ display: "flex", alignItems: "center", flex: "1 1 180px", minWidth: 0 }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#737373", marginLeft: 12, flexShrink: 0 }} aria-hidden="true">
+                    <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                  </svg>
+                  <input
+                    type="email"
+                    placeholder="Masukkan email Anda"
+                    aria-label="Alamat email"
+                    required
+                    style={{
+                      flex: 1,
+                      width: "100%",
+                      padding: "10px 12px",
+                      fontSize: "0.875rem",
+                      background: "transparent",
+                      color: "#171717",
+                      border: "none",
+                      outline: "none",
+                      minWidth: 0,
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    padding: "10px 20px",
+                    backgroundColor: "#171717",
+                    color: "#fafafa",
+                    borderRadius: 8,
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    border: "none",
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
+                    transition: "background-color 0.15s",
+                    flex: "0 1 auto",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#262626"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#171717"; }}
+                >
+                  Gabung Waitlist
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Footer body ── */}
+      {/* ── Footer body — paddingTop = setengah tinggi card (terukur real) + jarak aman, supaya konten tidak ketimpa card ── */}
       <div
         style={{
           position: "relative",
           backgroundColor: "#a8d946",
           borderTopLeftRadius: 48,
           borderTopRightRadius: 48,
-          paddingTop: 96,
+          paddingTop: halfCardHeight + 64,
           paddingBottom: 64,
         }}
       >
