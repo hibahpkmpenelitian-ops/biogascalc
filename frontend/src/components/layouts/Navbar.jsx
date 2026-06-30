@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 const NAV_LINKS = [
   { label: "Beranda", href: "/" },
@@ -12,6 +13,7 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const { pathname } = useLocation();
+  const { user, logout, isAdmin } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [modal, setModal] = useState(null); // 'login' | 'register' | null
@@ -162,45 +164,47 @@ export default function Navbar() {
                 Masuk
               </button>
 
-              {/* Register — pill putih + tail hijau-lime dengan ikon */}
-              <button
-                onClick={() => setModal("register")}
-                className="register-split-btn"
-                style={{
-                  padding: "4px",
-                  paddingLeft: "20px",
-                  borderRadius: 9999,
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "#0a0a0a",
-                  backgroundColor: "#f4f7f6",
-                  border: "none",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 12,
-                  lineHeight: 1.3,
-                  transition: "all 0.15s",
-                  cursor: "pointer",
-                }}
-              >
-                Daftar
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    backgroundColor: "#9fe870",
-                    flexShrink: 0,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M3 9 9 3M9 3H4M9 3v5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </button>
+                  {/* Register — pill putih + tail hijau-lime dengan ikon */}
+                  <button
+                    onClick={() => setModal("register")}
+                    className="register-split-btn"
+                    style={{
+                      padding: "4px",
+                      paddingLeft: "20px",
+                      borderRadius: 9999,
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "#0a0a0a",
+                      backgroundColor: "#f4f7f6",
+                      border: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 12,
+                      lineHeight: 1.3,
+                      transition: "all 0.15s",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Daftar
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        backgroundColor: "#9fe870",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M3 9 9 3M9 3H4M9 3v5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
 
             {/* ── Hamburger (mobile only) ── */}
@@ -298,40 +302,103 @@ export default function Navbar() {
 
               <div style={{ borderTop: "1px solid #e1e5e8", margin: "8px 0" }} />
 
-              <button
-                onClick={() => { setModal("login"); setMobileOpen(false); document.body.style.overflow = ""; }}
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 9999,
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  textAlign: "center",
-                  color: "#001e2b",
-                  border: "1px solid #c1ccd6",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                Masuk
-              </button>
-              <button
-                onClick={() => { setModal("register"); setMobileOpen(false); document.body.style.overflow = ""; }}
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 9999,
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  textAlign: "center",
-                  color: "#001e2b",
-                  backgroundColor: "#00ed64",
-                  border: "none",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                Daftar →
-              </button>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: 9999,
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        textAlign: "center",
+                        color: "#0a0a0a",
+                        backgroundColor: "#9fe870",
+                        textDecoration: "none",
+                        display: "block",
+                        width: "100%",
+                      }}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px" }}>
+                    <div
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #00ed64 0%, #00b545 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.8125rem",
+                        fontWeight: 700,
+                        color: "#001e2b",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#001e2b" }}>{user.name}</span>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    style={{
+                      padding: "12px 16px",
+                      borderRadius: 9999,
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      textAlign: "center",
+                      color: "#d32f2f",
+                      border: "1px solid #f5c6c6",
+                      backgroundColor: "transparent",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => { setModal("login"); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    style={{
+                      padding: "12px 16px",
+                      borderRadius: 9999,
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      textAlign: "center",
+                      color: "#001e2b",
+                      border: "1px solid #c1ccd6",
+                      backgroundColor: "transparent",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    Masuk
+                  </button>
+                  <button
+                    onClick={() => { setModal("register"); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    style={{
+                      padding: "12px 16px",
+                      borderRadius: 9999,
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      textAlign: "center",
+                      color: "#001e2b",
+                      backgroundColor: "#00ed64",
+                      border: "none",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    Daftar →
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </>

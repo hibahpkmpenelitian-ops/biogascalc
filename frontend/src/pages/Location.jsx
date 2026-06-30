@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import api from "../api/axios";
 
 /* ── Fix Leaflet default icon paths (Vite asset issue) ────── */
 delete L.Icon.Default.prototype._getIconUrl;
@@ -26,98 +27,6 @@ const makeIcon = (active = false) =>
     popupAnchor: [0, -42],
   });
 
-/* ── Sample location data ─────────────────────────────────── */
-const LOCATIONS = [
-  {
-    id: 1,
-    name: "Rumah Potong Hewan Surabaya",
-    city: "Surabaya, Jawa Timur",
-    lat: -7.2504,
-    lng: 112.7688,
-    type: "Peternakan",
-    limbahPerHari: 2400,
-    potensiGas: 840,
-    status: "Aktif",
-  },
-  {
-    id: 2,
-    name: "Sentra Ternak Bandung Selatan",
-    city: "Bandung, Jawa Barat",
-    lat: -7.0176,
-    lng: 107.6391,
-    type: "Peternakan",
-    limbahPerHari: 1850,
-    potensiGas: 648,
-    status: "Potensi",
-  },
-  {
-    id: 3,
-    name: "Kebun Sawit Deli Serdang",
-    city: "Medan, Sumatera Utara",
-    lat: 3.5952,
-    lng: 98.6722,
-    type: "Perkebunan",
-    limbahPerHari: 5200,
-    potensiGas: 2080,
-    status: "Aktif",
-  },
-  {
-    id: 4,
-    name: "Komunitas Ternak Sleman",
-    city: "Yogyakarta, DIY",
-    lat: -7.7956,
-    lng: 110.3695,
-    type: "Komunitas",
-    limbahPerHari: 960,
-    potensiGas: 336,
-    status: "Aktif",
-  },
-  {
-    id: 5,
-    name: "Industri Tahu Semarang Tengah",
-    city: "Semarang, Jawa Tengah",
-    lat: -6.9932,
-    lng: 110.4203,
-    type: "Industri",
-    limbahPerHari: 3100,
-    potensiGas: 1240,
-    status: "Potensi",
-  },
-  {
-    id: 6,
-    name: "Perkebunan Kelapa Musi Banyuasin",
-    city: "Palembang, Sumatera Selatan",
-    lat: -2.9761,
-    lng: 104.7754,
-    type: "Perkebunan",
-    limbahPerHari: 4700,
-    potensiGas: 1880,
-    status: "Aktif",
-  },
-  {
-    id: 7,
-    name: "Peternakan Sapi Gowa",
-    city: "Makassar, Sulawesi Selatan",
-    lat: -5.1477,
-    lng: 119.4327,
-    type: "Peternakan",
-    limbahPerHari: 1400,
-    potensiGas: 490,
-    status: "Potensi",
-  },
-  {
-    id: 8,
-    name: "Agrowisata Bogor Utara",
-    city: "Bogor, Jawa Barat",
-    lat: -6.5944,
-    lng: 106.7892,
-    type: "Komunitas",
-    limbahPerHari: 780,
-    potensiGas: 273,
-    status: "Aktif",
-  },
-];
-
 /* ── Type badge color mapping ─────────────────────────────── */
 const TYPE_COLOR = {
   Peternakan: { bg: "#e3fcef", text: "#00684a" },
@@ -138,12 +47,28 @@ function FlyTo({ target }) {
 /* ═══════════════════════════════════════════════════════════ */
 
 export default function Location() {
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(null);
   const [search, setSearch] = useState("");
   const [flyTarget, setFlyTarget] = useState(null);
   const markersRef = useRef({});
 
-  const filtered = LOCATIONS.filter(
+  useEffect(() => {
+    const fetchDomes = async () => {
+      try {
+        const { data } = await api.get("/domes");
+        setLocations(data.data);
+      } catch (err) {
+        console.error("Gagal memuat data lokasi:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDomes();
+  }, []);
+
+  const filtered = locations.filter(
     (loc) =>
       loc.name.toLowerCase().includes(search.toLowerCase()) ||
       loc.city.toLowerCase().includes(search.toLowerCase()) ||
@@ -151,11 +76,11 @@ export default function Location() {
   );
 
   const handleSelectLocation = useCallback((loc) => {
-    setActive(loc.id);
+    const id = loc._id || loc.id;
+    setActive(id);
     setFlyTarget(loc);
-    /* Open popup after fly animation */
     setTimeout(() => {
-      markersRef.current[loc.id]?.openPopup();
+      markersRef.current[id]?.openPopup();
     }, 1300);
   }, []);
 
@@ -198,7 +123,7 @@ export default function Location() {
                 }}
               />
               <span style={{ fontSize: "0.8125rem", fontWeight: 500, color: "#00684a" }}>
-                {LOCATIONS.filter((l) => l.status === "Aktif").length} lokasi aktif
+                {locations.filter((l) => l.status === "Aktif").length} lokasi aktif
               </span>
             </div>
           </div>
@@ -270,19 +195,26 @@ export default function Location() {
 
           {/* Location count */}
           <div style={{ padding: "0.75rem 1rem", borderBottom: "1px solid #eceff1" }}>
-            <p style={{ fontSize: "0.8125rem", color: "#7c8c9a" }}>{filtered.length} lokasi ditemukan</p>
+            <p style={{ fontSize: "0.8125rem", color: "#7c8c9a" }}>
+              {loading ? "Memuat..." : `${filtered.length} lokasi ditemukan`}
+            </p>
           </div>
 
           {/* Cards */}
           <ul style={{ listStyle: "none" }}>
-            {filtered.length === 0 ? (
+            {loading ? (
+              <li style={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
+                <div className="admin-spinner" />
+              </li>
+            ) : filtered.length === 0 ? (
               <li style={{ padding: "2rem 1rem", textAlign: "center", color: "#a8b3bc", fontSize: "0.875rem" }}>Tidak ada lokasi yang cocok.</li>
             ) : (
               filtered.map((loc) => {
-                const isActive = active === loc.id;
+                const locId = loc._id || loc.id;
+                const isActive = active === locId;
                 const badge = TYPE_COLOR[loc.type] ?? { bg: "#f9fbfa", text: "#5c6c7a" };
                 return (
-                  <li key={loc.id} style={{ borderBottom: "1px solid #eceff1" }}>
+                  <li key={locId} style={{ borderBottom: "1px solid #eceff1" }}>
                     <button
                       onClick={() => handleSelectLocation(loc)}
                       style={{
@@ -350,7 +282,7 @@ export default function Location() {
                           {loc.type}
                         </span>
                         <span style={{ fontSize: "0.8125rem", color: "#3d4f5b", fontWeight: 500 }}>
-                          {loc.potensiGas.toLocaleString("id-ID")} <span style={{ color: "#a8b3bc", fontWeight: 400 }}>m³/hari</span>
+                          {(loc.potensiGas || 0).toLocaleString("id-ID")} <span style={{ color: "#a8b3bc", fontWeight: 400 }}>m³/hari</span>
                         </span>
                       </div>
                     </button>
@@ -372,89 +304,92 @@ export default function Location() {
 
             <FlyTo target={flyTarget} />
 
-            {filtered.map((loc) => (
-              <Marker
-                key={loc.id}
-                position={[loc.lat, loc.lng]}
-                icon={makeIcon(active === loc.id)}
-                ref={(ref) => {
-                  if (ref) markersRef.current[loc.id] = ref;
-                }}
-                eventHandlers={{
-                  click: () => handleSelectLocation(loc),
-                }}
-              >
-                <Popup closeButton={false} className="leaflet-popup-biogascalc">
-                  <div style={{ minWidth: 220, padding: "4px 2px" }}>
-                    {/* Popup header */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        marginBottom: "0.625rem",
-                      }}
-                    >
+            {filtered.map((loc) => {
+              const locId = loc._id || loc.id;
+              return (
+                <Marker
+                  key={locId}
+                  position={[loc.lat, loc.lng]}
+                  icon={makeIcon(active === locId)}
+                  ref={(ref) => {
+                    if (ref) markersRef.current[locId] = ref;
+                  }}
+                  eventHandlers={{
+                    click: () => handleSelectLocation(loc),
+                  }}
+                >
+                  <Popup closeButton={false} className="leaflet-popup-biogascalc">
+                    <div style={{ minWidth: 220, padding: "4px 2px" }}>
+                      {/* Popup header */}
                       <div
                         style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          backgroundColor: loc.status === "Aktif" ? "#00ed64" : "#e0a010",
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontSize: "0.6875rem",
-                          fontWeight: 600,
-                          color: loc.status === "Aktif" ? "#00684a" : "#946f3f",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          marginBottom: "0.625rem",
                         }}
                       >
-                        {loc.status}
-                      </span>
-                    </div>
-
-                    <p
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: "#001e2b",
-                        lineHeight: 1.4,
-                        marginBottom: "0.25rem",
-                      }}
-                    >
-                      {loc.name}
-                    </p>
-                    <p style={{ fontSize: "0.8125rem", color: "#7c8c9a", marginBottom: "0.75rem" }}>{loc.city}</p>
-
-                    {/* Stats grid */}
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: "0.5rem",
-                        padding: "0.625rem",
-                        backgroundColor: "#f9fbfa",
-                        borderRadius: 8,
-                        border: "1px solid #e1e5e8",
-                      }}
-                    >
-                      <div>
-                        <p style={{ fontSize: "0.6875rem", color: "#a8b3bc", marginBottom: 2 }}>Limbah/hari</p>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#001e2b" }}>{loc.limbahPerHari.toLocaleString("id-ID")} kg</p>
+                        <div
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: loc.status === "Aktif" ? "#00ed64" : "#e0a010",
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: "0.6875rem",
+                            fontWeight: 600,
+                            color: loc.status === "Aktif" ? "#00684a" : "#946f3f",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                          }}
+                        >
+                          {loc.status}
+                        </span>
                       </div>
-                      <div>
-                        <p style={{ fontSize: "0.6875rem", color: "#a8b3bc", marginBottom: 2 }}>Potensi gas</p>
-                        <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#00684a" }}>{loc.potensiGas.toLocaleString("id-ID")} m³</p>
+
+                      <p
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: 600,
+                          color: "#001e2b",
+                          lineHeight: 1.4,
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        {loc.name}
+                      </p>
+                      <p style={{ fontSize: "0.8125rem", color: "#7c8c9a", marginBottom: "0.75rem" }}>{loc.city}</p>
+
+                      {/* Stats grid */}
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: "0.5rem",
+                          padding: "0.625rem",
+                          backgroundColor: "#f9fbfa",
+                          borderRadius: 8,
+                          border: "1px solid #e1e5e8",
+                        }}
+                      >
+                        <div>
+                          <p style={{ fontSize: "0.6875rem", color: "#a8b3bc", marginBottom: 2 }}>Limbah/hari</p>
+                          <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#001e2b" }}>{(loc.limbahPerHari || 0).toLocaleString("id-ID")} kg</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: "0.6875rem", color: "#a8b3bc", marginBottom: 2 }}>Potensi gas</p>
+                          <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#00684a" }}>{(loc.potensiGas || 0).toLocaleString("id-ID")} m³</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+                  </Popup>
+                </Marker>
+              );
+            })}
           </MapContainer>
 
           {/* Map overlay: summary stats */}
@@ -476,7 +411,7 @@ export default function Location() {
               Total Potensi
             </p>
             <p style={{ fontSize: "1.5rem", fontWeight: 600, color: "#00684a", lineHeight: 1.1 }}>
-              {LOCATIONS.reduce((s, l) => s + l.potensiGas, 0).toLocaleString("id-ID")}
+              {locations.reduce((s, l) => s + (l.potensiGas || 0), 0).toLocaleString("id-ID")}
             </p>
             <p style={{ fontSize: "0.8125rem", color: "#a8b3bc", marginTop: 2 }}>m³ gas/hari</p>
           </div>

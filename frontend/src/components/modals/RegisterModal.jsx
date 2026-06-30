@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ModalBase from "./ModalBase";
+import { useAuth } from "../../contexts/AuthContext";
 
 function InputField({ label, id, type = "text", placeholder, value, onChange, rightSlot, hint }) {
   return (
@@ -74,6 +75,7 @@ function PasswordStrength({ password }) {
 }
 
 export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
+  const { register } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw, setShowPw] = useState(false);
   const [showCf, setShowCf] = useState(false);
@@ -115,11 +117,13 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
     }
     setLoading(true);
     try {
-      /* TODO: hubungkan ke POST /api/auth/register */
-      await new Promise((r) => setTimeout(r, 900));
+      await register(form.name, form.email, form.password);
       handleClose();
-    } catch {
-      setError("Pendaftaran gagal. Coba lagi.");
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        "Pendaftaran gagal. Coba lagi.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
