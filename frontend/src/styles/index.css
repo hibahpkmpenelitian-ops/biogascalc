@@ -918,6 +918,20 @@ button {
 }
 
 /* ============================================================
+   MAIN CONTENT OFFSET — kompensasi navbar fixed (pill mengambang)
+   ============================================================ */
+
+.main-content-offset {
+  padding-top: 90px;
+}
+
+@media (max-width: 850px) {
+  .main-content-offset {
+    padding-top: 72px;
+  }
+}
+
+/* ============================================================
    LEAFLET OVERRIDES — sesuaikan popup dengan design system
    ============================================================ */
 

@@ -37,50 +37,50 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Navbar — pill hitam full-width, sudut bawah rounded, notch SVG kiri/kanan ── */}
+      {/* ── Navbar — pill hitam mengambang, max-width terbatas, full-width di mobile ── */}
       <header
-        className={`sticky top-0 z-50 w-full transition-shadow duration-200 ${scrolled ? "shadow-[rgba(0,0,0,0.25)_0px_8px_20px_0px]" : ""}`}
-        style={{ position: "relative" }}
+        className="fixed left-1/2 -translate-x-1/2 w-full max-w-5xl max-[850px]:max-w-none max-[850px]:left-0 max-[850px]:translate-x-0 transition-shadow duration-200"
+        style={{
+          top: 10,
+          zIndex: 50,
+          backgroundColor: "#0a0a0a",
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          borderBottomLeftRadius: 24,
+          borderBottomRightRadius: 24,
+          boxShadow: scrolled
+            ? "rgba(0,0,0,0.25) 0px 8px 20px 0px"
+            : "rgba(0,0,0,0.2) 0px 25px 50px -12px",
+        }}
       >
-        {/* SVG kiri — quarter-circle, menempel di luar sisi kiri pill, vertically centered (top: 30px) */}
+        {/* SVG kiri — quarter-circle notch, menempel di luar sisi kiri pill (desktop only) */}
         <svg
           aria-hidden="true"
           width="50"
           height="50"
           viewBox="0 0 50 50"
           fill="none"
-          style={{ position: "absolute", left: -49, top: 30, transform: "rotate(-180deg)" }}
+          className="hidden min-[851px]:block pointer-events-none"
+          style={{ position: "absolute", left: -49, top: 0, transform: "rotate(180deg)", color: "#0a0a0a" }}
         >
-          <g clipPath="url(#clip0_62_1095)">
-            <path d="M50 50C50.0079 12.6999 41.0038 -0.0116 0 0H50V50V50" fill="#0a0a0a" />
-          </g>
-          <defs>
-            <clipPath id="clip0_62_1095">
-              <rect width="50" height="50" fill="white" transform="matrix(-1 0 0 -1 50 50)" />
-            </clipPath>
-          </defs>
+          <path d="M5.50871e-06 0C-0.00788227 37.3001 8.99616 50.0116 50 50H5.50871e-06V0Z" fill="currentColor" />
         </svg>
 
-        {/* SVG kanan — quarter-circle, menempel di luar sisi kanan pill, vertically centered (top: 30px) */}
+        {/* SVG kanan — quarter-circle notch, menempel di luar sisi kanan pill (desktop only) */}
         <svg
           aria-hidden="true"
           width="50"
           height="50"
           viewBox="0 0 50 50"
           fill="none"
-          style={{ position: "absolute", right: -48.99, top: 30, transform: "rotate(90deg)" }}
+          className="hidden min-[851px]:block pointer-events-none"
+          style={{ position: "absolute", right: -49, top: 0, transform: "rotate(90deg)", color: "#0a0a0a" }}
         >
-          <g clipPath="url(#clip0_62_1097)">
-            <path d="M50 5.17597e-06C12.6999 -0.0078826 -0.0116 8.99616 0 50V5.17597e-06H50V5.17597e-06" fill="#0a0a0a" />
-          </g>
-          <defs>
-            <clipPath id="clip0_62_1097">
-              <rect width="50" height="50" fill="white" transform="matrix(0 1 -1 0 50 0)" />
-            </clipPath>
-          </defs>
+          <path d="M5.50871e-06 0C-0.00788227 37.3001 8.99616 50.0116 50 50H5.50871e-06V0Z" fill="currentColor" />
         </svg>
 
         <div
+          className="max-[850px]:h-18"
           style={{
             display: "flex",
             height: 80,
@@ -88,12 +88,11 @@ export default function Navbar() {
             justifyContent: "space-between",
             alignItems: "center",
             alignSelf: "stretch",
-            backgroundColor: "#0a0a0a",
             borderBottomLeftRadius: 24,
             borderBottomRightRadius: 24,
           }}
         >
-          <div style={{ maxWidth: 1280, width: "100%", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {/* ── KIRI: Logo + Nama ── */}
             <Link to="/" className="flex items-center gap-3" style={{ textDecoration: "none" }}>
               <img src="/Logo.png" alt="BioGasCalc logo" className="w-8 h-8 rounded-full object-cover" style={{ border: "1px solid #2a2a2a" }} />
@@ -103,7 +102,7 @@ export default function Navbar() {
             </Link>
 
             {/* ── TENGAH: Nav links (desktop) ── */}
-            <nav aria-label="Navigasi utama" className="hidden md:flex items-center gap-1">
+            <nav aria-label="Navigasi utama" className="hidden min-[851px]:flex items-center gap-1">
               {NAV_LINKS.map((link) => {
                 const isActive = pathname === link.href;
                 return (
@@ -141,107 +140,29 @@ export default function Navbar() {
             </nav>
 
             {/* ── KANAN: Auth buttons (desktop) ── */}
-            <div className="hidden md:flex items-center gap-2">
-              {user ? (
-                <>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      style={{
-                        padding: "8px 16px",
-                        borderRadius: 9999,
-                        fontSize: "0.8125rem",
-                        fontWeight: 600,
-                        color: "#0a0a0a",
-                        backgroundColor: "#9fe870",
-                        textDecoration: "none",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                        transition: "all 0.15s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#8ad860";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#9fe870";
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                      Admin Panel
-                    </Link>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: "50%",
-                        background: "linear-gradient(135deg, #00ed64 0%, #00b545 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.8125rem",
-                        fontWeight: 700,
-                        color: "#001e2b",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 500, color: "#ffffff", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {user.name}
-                    </span>
-                  </div>
-                  <button
-                    onClick={logout}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 9999,
-                      fontSize: "0.8125rem",
-                      fontWeight: 600,
-                      color: "#a8b3bc",
-                      border: "1px solid #2a2a2a",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "#ffffff";
-                      e.currentTarget.style.borderColor = "#555";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "#a8b3bc";
-                      e.currentTarget.style.borderColor = "#2a2a2a";
-                    }}
-                  >
-                    Keluar
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* Login — teks polos */}
-                  <button
-                    onClick={() => setModal("login")}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 9999,
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#ffffff",
-                      border: "none",
-                      backgroundColor: "transparent",
-                      transition: "all 0.15s",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      lineHeight: 1.3,
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
-                  >
-                    Masuk
-                  </button>
+            <div className="hidden min-[851px]:flex items-center gap-2">
+              {/* Login — teks polos */}
+              <button
+                onClick={() => setModal("login")}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 9999,
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  color: "#ffffff",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  transition: "all 0.15s",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  lineHeight: 1.3,
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
+              >
+                Masuk
+              </button>
 
                   {/* Register — pill putih + tail hijau-lime dengan ikon */}
                   <button
@@ -292,7 +213,7 @@ export default function Navbar() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-              className="md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg gap-[5px]"
+              className="max-[850px]:flex hidden flex-col items-center justify-center w-10 h-10 rounded-lg gap-[5px]"
               style={{ border: "1px solid #2a2a2a", backgroundColor: "transparent" }}
             >
               <span
@@ -329,7 +250,7 @@ export default function Navbar() {
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 md:hidden"
+            className="fixed inset-0 z-40 max-[850px]:block hidden"
             style={{ backgroundColor: "rgba(0,30,43,0.4)", backdropFilter: "blur(4px)" }}
             onClick={() => {
               setMobileOpen(false);
@@ -339,8 +260,8 @@ export default function Navbar() {
           />
           <div
             id="mobile-menu"
-            className="fixed top-16 left-0 right-0 z-50 md:hidden"
-            style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e1e5e8" }}
+            className="fixed left-0 right-0 z-50 max-[850px]:block hidden"
+            style={{ top: 72, backgroundColor: "#ffffff", borderBottom: "1px solid #e1e5e8" }}
           >
             <div className="flex flex-col gap-1 p-4" style={{ maxWidth: 1280, margin: "0 auto" }}>
               {NAV_LINKS.map((link) => {
