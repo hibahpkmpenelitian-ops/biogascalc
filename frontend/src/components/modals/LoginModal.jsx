@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ModalBase from "./ModalBase";
+import { useAuth } from "../../contexts/AuthContext";
 
 function InputField({ label, id, type = "text", placeholder, value, onChange, rightSlot }) {
   return (
@@ -47,6 +49,8 @@ function InputField({ label, id, type = "text", placeholder, value, onChange, ri
 }
 
 export default function LoginModal({ open, onClose, onSwitchToRegister }) {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -78,11 +82,16 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
     }
     setLoading(true);
     try {
-      /* TODO: hubungkan ke POST /api/auth/login */
-      await new Promise((r) => setTimeout(r, 800));
+      const data = await login(email, password);
       handleClose();
-    } catch {
-      setError("Login gagal. Periksa kembali email dan password.");
+      if (data.user?.role === 'admin') {
+        navigate('/admin');
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        "Login gagal. Periksa kembali email dan password.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
