@@ -85,7 +85,10 @@ export default function Location() {
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "calc(100vh - 64px)" }}>
+    <div
+      className="max-[850px]:pt-23"
+      style={{ display: "flex", flexDirection: "column", minHeight: "calc(100vh - 64px)", paddingTop: 106 }}
+    >
       {/* ── Page header ── */}
       <div
         style={{
@@ -97,7 +100,7 @@ export default function Location() {
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-              <p className="text-micro-uppercase mb-1" style={{ color: "#00684a" }}>
+              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "#00684a" }}>
                 Peta Sebaran
               </p>
               <h1
@@ -407,7 +410,7 @@ export default function Location() {
               minWidth: 180,
             }}
           >
-            <p className="text-micro-uppercase mb-2" style={{ color: "#7c8c9a" }}>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: "#7c8c9a" }}>
               Total Potensi
             </p>
             <p style={{ fontSize: "1.5rem", fontWeight: 600, color: "#00684a", lineHeight: 1.1 }}>

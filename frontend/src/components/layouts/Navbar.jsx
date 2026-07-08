@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import LoginModal from "../modals/LoginModal";
 import RegisterModal from "../modals/RegisterModal";
 import { useAuth } from "../../contexts/AuthContext";
@@ -38,7 +39,11 @@ export default function Navbar() {
   return (
     <>
       {/* ── Navbar — pill hitam mengambang, max-width terbatas, full-width di mobile ── */}
-      <header
+      {/* Entrance: slide turun dari atas, sekali saat mount, slow & smooth ── */}
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         className="fixed left-1/2 -translate-x-1/2 w-full max-w-5xl max-[850px]:max-w-none max-[850px]:left-0 max-[850px]:translate-x-0 transition-shadow duration-200"
         style={{
           top: 10,
@@ -141,28 +146,90 @@ export default function Navbar() {
 
             {/* ── KANAN: Auth buttons (desktop) ── */}
             <div className="hidden min-[851px]:flex items-center gap-2">
-              {/* Login — teks polos */}
-              <button
-                onClick={() => setModal("login")}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 9999,
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  color: "#ffffff",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  transition: "all 0.15s",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  lineHeight: 1.3,
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
-              >
-                Masuk
-              </button>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: 9999,
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "#0a0a0a",
+                        backgroundColor: "#2DA44E",
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #2DA44E 0%, #218838 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      color: "#001e2b",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <button
+                    onClick={logout}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 9999,
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "#ffffff",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      transition: "all 0.15s",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      lineHeight: 1.3,
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
+                  >
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Login — teks polos */}
+                  <button
+                    onClick={() => setModal("login")}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: 9999,
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "#ffffff",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      transition: "all 0.15s",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      lineHeight: 1.3,
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
+                  >
+                    Masuk
+                  </button>
 
                   {/* Register — pill putih + tail hijau-lime dengan ikon */}
                   <button
@@ -194,7 +261,7 @@ export default function Navbar() {
                         width: 32,
                         height: 32,
                         borderRadius: "50%",
-                        backgroundColor: "#9fe870",
+                        backgroundColor: "#2DA44E",
                         flexShrink: 0,
                       }}
                     >
@@ -207,25 +274,25 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* ── Hamburger (mobile only) ── */}
+            {/* ── Hamburger (mobile only) — 3 garis absolute-centered, jadi X presisi saat open ── */}
             <button
               onClick={toggleMenu}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-              className="max-[850px]:flex hidden flex-col items-center justify-center w-10 h-10 rounded-lg gap-[5px]"
+              className="max-[850px]:flex hidden relative items-center justify-center w-10 h-10 rounded-lg"
               style={{ border: "1px solid #2a2a2a", backgroundColor: "transparent" }}
             >
               <span
-                className="block w-5 rounded-full transition-all duration-200"
+                className="absolute block w-5 rounded-full transition-all duration-200"
                 style={{
                   height: 1.5,
                   backgroundColor: "#ffffff",
-                  transform: mobileOpen ? "rotate(45deg) translateY(6.5px)" : "none",
+                  transform: mobileOpen ? "rotate(45deg)" : "translateY(-6.5px)",
                 }}
               />
               <span
-                className="block w-5 rounded-full transition-all duration-200"
+                className="absolute block w-5 rounded-full transition-all duration-200"
                 style={{
                   height: 1.5,
                   backgroundColor: "#ffffff",
@@ -234,17 +301,17 @@ export default function Navbar() {
                 }}
               />
               <span
-                className="block w-5 rounded-full transition-all duration-200"
+                className="absolute block w-5 rounded-full transition-all duration-200"
                 style={{
                   height: 1.5,
                   backgroundColor: "#ffffff",
-                  transform: mobileOpen ? "rotate(-45deg) translateY(-6.5px)" : "none",
+                  transform: mobileOpen ? "rotate(-45deg)" : "translateY(6.5px)",
                 }}
               />
             </button>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* ── Mobile menu ── */}
       {mobileOpen && (
@@ -291,7 +358,7 @@ export default function Navbar() {
                           width: 6,
                           height: 6,
                           borderRadius: "50%",
-                          backgroundColor: "#00ed64",
+                          backgroundColor: "#2DA44E",
                           display: "block",
                         }}
                       />
@@ -314,7 +381,7 @@ export default function Navbar() {
                         fontWeight: 600,
                         textAlign: "center",
                         color: "#0a0a0a",
-                        backgroundColor: "#9fe870",
+                        backgroundColor: "#2DA44E",
                         textDecoration: "none",
                         display: "block",
                         width: "100%",
@@ -329,7 +396,7 @@ export default function Navbar() {
                         width: 34,
                         height: 34,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #00ed64 0%, #00b545 100%)",
+                        background: "linear-gradient(135deg, #2DA44E 0%, #218838 100%)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -389,7 +456,7 @@ export default function Navbar() {
                       fontWeight: 600,
                       textAlign: "center",
                       color: "#001e2b",
-                      backgroundColor: "#00ed64",
+                      backgroundColor: "#2DA44E",
                       border: "none",
                       cursor: "pointer",
                       width: "100%",

@@ -16,36 +16,16 @@ function solveHeight(f, df, initial, maxIter = 50, tol = 1e-9) {
   return Math.max(0, h);
 }
 
-/* ── Volume of dome interior up to height h ──────────────────*/
-function capVolume(shapeType, radius, domeHeight, h) {
-  if (h <= 0) return 0;
-  if (shapeType === "hemisphere") {
-    const r = radius;
-    const hc = Math.min(h, r);
-    // Spherical cap from bottom: V = π(r²hc − hc³/3)
-    return Math.PI * (r * r * hc - (hc * hc * hc) / 3);
-  } else {
-    // Semi-ellipsoid (a=radius, b=domeHeight)
-    const a = radius, b = domeHeight > 0 ? domeHeight : radius;
-    const hc = Math.min(h, b);
-    return Math.PI * a * a * (hc - hc ** 3 / (3 * b * b));
-  }
+/* ═══════════════════ CIRCULAR DOME (hemisphere) ═══════════════
+   diameter & height given in cm, converted to meters internally.
+   ------------------------------------------------------------ */
+function circularTotalVolume(radius, domeHeight) {
+  const r = radius, b = domeHeight > 0 ? domeHeight : radius;
+  if (Math.abs(b - r) < 1e-9) return (2 / 3) * Math.PI * r ** 3;
+  return (2 / 3) * Math.PI * r * r * b;
 }
 
-/* ── Total dome volume ────────────────────────────────────────*/
-function totalVolume(shapeType, radius, domeHeight) {
-  if (shapeType === "hemisphere") {
-    return (2 / 3) * Math.PI * radius ** 3;
-  }
-  const a = radius, b = domeHeight > 0 ? domeHeight : radius;
-  return (2 / 3) * Math.PI * a * a * b;
-}
-
-/* ── Surface area ─────────────────────────────────────────────*/
-function surfaceArea(shapeType, radius, domeHeight) {
-  if (shapeType === "hemisphere") {
-    return 2 * Math.PI * radius ** 2;
-  }
+function circularSurfaceArea(radius, domeHeight) {
   const a = radius, c = domeHeight > 0 ? domeHeight : radius;
   if (Math.abs(a - c) < 1e-9) return 2 * Math.PI * a * a;
   if (c < a) {
@@ -56,40 +36,90 @@ function surfaceArea(shapeType, radius, domeHeight) {
   return 2 * Math.PI * a * a * (1 + (c / (a * e)) * Math.asin(e));
 }
 
-/* ── Slurry height from volume fraction ──────────────────────*/
-function slurryHeight(shapeType, radius, domeHeight, volumeFraction) {
-  const Vtotal = totalVolume(shapeType, radius, domeHeight);
+function circularSlurryHeight(radius, domeHeight, volumeFraction) {
+  const Vtotal = circularTotalVolume(radius, domeHeight);
   const Vslurry = Vtotal * volumeFraction;
+  const maxH = domeHeight;
   if (Vslurry <= 0) return 0;
-  const maxH = shapeType === "hemisphere" ? radius : domeHeight;
   if (Vslurry >= Vtotal) return maxH;
 
-  if (shapeType === "hemisphere") {
-    const r = radius;
-    const f  = (h) => Math.PI * (r * r * h - h ** 3 / 3) - Vslurry;
-    const df = (h) => Math.PI * (r * r - h * h);
-    return solveHeight(f, df, maxH * volumeFraction);
-  } else {
-    const a = radius, b = domeHeight > 0 ? domeHeight : radius;
-    const f  = (h) => Math.PI * a * a * (h - h ** 3 / (3 * b * b)) - Vslurry;
-    const df = (h) => Math.PI * a * a * (1 - h * h / (b * b));
-    return solveHeight(f, df, maxH * volumeFraction);
-  }
+  const a = radius, b = domeHeight;
+  const f  = (h) => Math.PI * a * a * (h - h ** 3 / (3 * b * b)) - Vslurry;
+  const df = (h) => Math.PI * a * a * (1 - h * h / (b * b));
+  return solveHeight(f, df, maxH * volumeFraction);
+}
+
+/* ═══════════════════ RECTANGLE DOME (box + half-cylinder roof) ═
+   length, width, wallHeight given in cm, converted to meters.
+   Roof is a half-cylinder: radius = width / 2.
+   ------------------------------------------------------------ */
+function rectangleTotalVolume(length, width, wallHeight) {
+  const roofRadius = width / 2;
+  const wallVolume = length * width * wallHeight;
+  const roofVolume = (Math.PI * roofRadius * roofRadius * length) / 2;
+  return wallVolume + roofVolume;
+}
+
+function rectangleSurfaceArea(length, width, wallHeight) {
+  const roofRadius = width / 2;
+  // Walls: 2 long sides + 2 short ends (rectangle up to wallHeight) + half-cylinder shell
+  const longWalls = 2 * (length * wallHeight);
+  const shortEnds = 2 * (width * wallHeight);
+  const roofShell = Math.PI * roofRadius * length;
+  const roofEndCaps = 2 * ((Math.PI * roofRadius * roofRadius) / 2);
+  return longWalls + shortEnds + roofShell + roofEndCaps;
+}
+
+function rectangleSlurryHeight(length, width, wallHeight, volumeFraction) {
+  const Vtotal = rectangleTotalVolume(length, width, wallHeight);
+  const Vslurry = Vtotal * volumeFraction;
+  if (Vslurry <= 0) return 0;
+  if (Vslurry >= Vtotal) return wallHeight;
+  // Fill is a straight prism while within the wall (roof only fills after walls are full)
+  const h = Vslurry / (length * width);
+  return Math.min(h, wallHeight);
 }
 
 /* ═══════════════════════════════════════════════════════════ */
 
-export function useDomeCalculations({ diameter, height, slurryPct, shapeType }) {
-  return useMemo(() => {
-    const radius     = Math.max(0.01, diameter / 2);
-    const domeHeight = Math.max(0.01, height);
-    const fraction   = Math.min(1, Math.max(0, slurryPct / 100));
-    const shape      = shapeType === "hemisphere" ? "hemisphere" : "semiEllipsoid";
+export function useDomeCalculations(params) {
+  const { shapeType } = params;
 
-    const Vtotal   = totalVolume(shape, radius, domeHeight);
-    const SA       = surfaceArea(shape, radius, domeHeight);
+  return useMemo(() => {
+    const fraction = Math.min(1, Math.max(0, params.slurryPct / 100));
+
+    if (shapeType === "rectangle") {
+      const length = Math.max(0.01, params.length / 100);
+      const width  = Math.max(0.01, params.width / 100);
+      const wallHeight = Math.max(0.01, params.wallHeight / 100);
+
+      const Vtotal  = rectangleTotalVolume(length, width, wallHeight);
+      const SA      = rectangleSurfaceArea(length, width, wallHeight);
+      const Vslurry = Vtotal * fraction;
+      const hSlurry = rectangleSlurryHeight(length, width, wallHeight, fraction);
+      const Vgas    = Vtotal - Vslurry;
+
+      return {
+        totalVolume:  +Vtotal.toFixed(3),
+        surfaceArea:  +SA.toFixed(3),
+        slurryVolume: +Vslurry.toFixed(3),
+        slurryHeight: +hSlurry.toFixed(3),
+        gasVolume:    +Vgas.toFixed(3),
+        length, width, wallHeight,
+        roofRadius: width / 2,
+        fraction,
+        shape: "rectangle",
+      };
+    }
+
+    // Circular
+    const radius     = Math.max(0.01, params.diameter / 2 / 100);
+    const domeHeight = Math.max(0.01, params.height / 100);
+
+    const Vtotal   = circularTotalVolume(radius, domeHeight);
+    const SA       = circularSurfaceArea(radius, domeHeight);
     const Vslurry  = Vtotal * fraction;
-    const hSlurry  = slurryHeight(shape, radius, domeHeight, fraction);
+    const hSlurry  = circularSlurryHeight(radius, domeHeight, fraction);
     const Vgas     = Vtotal - Vslurry;
 
     return {
@@ -101,7 +131,15 @@ export function useDomeCalculations({ diameter, height, slurryPct, shapeType }) 
       radius,
       domeHeight,
       fraction,
-      shape,
+      shape: "circular",
     };
-  }, [diameter, height, slurryPct, shapeType]);
+  }, [
+    shapeType,
+    params.slurryPct,
+    params.diameter,
+    params.height,
+    params.length,
+    params.width,
+    params.wallHeight,
+  ]);
 }

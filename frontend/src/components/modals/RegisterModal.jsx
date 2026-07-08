@@ -51,7 +51,7 @@ function InputField({ label, id, type = "text", placeholder, value, onChange, ri
 function PasswordStrength({ password }) {
   const score = [/.{8,}/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(password)).length;
   const labels = ["", "Lemah", "Cukup", "Kuat", "Sangat Kuat"];
-  const colors = ["#e1e5e8", "#fa6e39", "#f5bc2f", "#00a35c", "#00ed64"];
+  const colors = ["#e1e5e8", "#fa6e39", "#f5bc2f", "#00a35c", "#2DA44E"];
   if (!password) return null;
   return (
     <div style={{ marginTop: 6 }}>
@@ -248,8 +248,8 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
             height: 44,
             borderRadius: 9999,
             border: "none",
-            backgroundColor: loading ? "#c1ccd6" : "#00ed64",
-            color: loading ? "#7c8c9a" : "#001e2b",
+            backgroundColor: loading ? "#c1ccd6" : "#2DA44E",
+            color: loading ? "#7c8c9a" : "#ffffff",
             fontSize: "0.9375rem",
             fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
@@ -257,10 +257,10 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
             marginTop: 4,
           }}
           onMouseEnter={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#00b545";
+            if (!loading) e.currentTarget.style.backgroundColor = "#218838";
           }}
           onMouseLeave={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#00ed64";
+            if (!loading) e.currentTarget.style.backgroundColor = "#2DA44E";
           }}
         >
           {loading ? "Memproses…" : "Buat Akun"}

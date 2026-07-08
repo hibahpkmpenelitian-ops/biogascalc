@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { useDomeCalculations } from "../../hooks/useDomeCalculations";
-import ParameterPanel  from "./ParameterPanel";
-import DomeVisualizer  from "./DomeVisualizer";
-import StatsPanel      from "./StatsPanel";
-
-const DEFAULT_PARAMS = {
-  diameter:  6,
-  height:    4,
-  slurryPct: 30,
-  shapeType: "hemisphere",
-};
+import ParameterPanel, { DEFAULT_PARAMS } from "./ParameterPanel";
+import DomeVisualizer   from "./DomeVisualizer";
+import StatsPanel       from "./StatsPanel";
+import MaterialsTable    from "./MaterialsTable";
 
 export default function DomeCalculator() {
   const [params, setParams] = useState(DEFAULT_PARAMS);
@@ -21,7 +15,7 @@ export default function DomeCalculator() {
       {/* ── Title row ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <p className="text-micro-uppercase mb-0.5" style={{ color: "#00684a" }}>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
             Rancang Dome
           </p>
           <h1 style={{ fontSize: "1.375rem", fontWeight: 500, color: "#001e2b" }}>
@@ -57,6 +51,9 @@ export default function DomeCalculator() {
         {/* ── RIGHT: Stats ── */}
         <StatsPanel calc={calc} params={params} />
       </div>
+
+      {/* ── Materials estimate table ── */}
+      <MaterialsTable calc={calc} params={params} />
     </div>
   );
 }

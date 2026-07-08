@@ -66,7 +66,7 @@ export default function StatsPanel({ calc, params }) {
     >
       {/* Header */}
       <div>
-        <p className="text-micro-uppercase mb-0.5" style={{ color: "#00684a" }}>
+        <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
           Hasil Kalkulasi
         </p>
         <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#001e2b" }}>
@@ -116,18 +116,26 @@ export default function StatsPanel({ calc, params }) {
 
       <Divider label="Dimensi Dome" />
 
-      <div className="grid grid-cols-2 gap-2">
-        <StatCard
-          label="Diameter"
-          value={params.diameter}
-          unit="m"
-        />
-        <StatCard
-          label="Tinggi"
-          value={params.height}
-          unit="m"
-        />
-      </div>
+      {params.shapeType === "rectangle" ? (
+        <div className="grid grid-cols-3 gap-2">
+          <StatCard label="Panjang" value={params.length} unit="cm" />
+          <StatCard label="Lebar" value={params.width} unit="cm" />
+          <StatCard label="Tinggi" value={params.wallHeight} unit="cm" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <StatCard
+            label="Diameter"
+            value={params.diameter}
+            unit="cm"
+          />
+          <StatCard
+            label="Tinggi"
+            value={params.height}
+            unit="cm"
+          />
+        </div>
+      )}
 
       <Divider label="Volume & Luas" />
 
@@ -176,7 +184,7 @@ export default function StatsPanel({ calc, params }) {
             textTransform: "capitalize",
           }}
         >
-          {params.shapeType === "semiEllipsoid" ? "Semi-Ellipsoid" : params.shapeType}
+          {params.shapeType === "rectangle" ? "Rectangle" : "Circular"}
         </span>
       </div>
     </div>
