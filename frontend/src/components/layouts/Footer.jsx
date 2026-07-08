@@ -49,7 +49,6 @@ export default function Footer() {
 
   return (
     <footer style={{ position: "relative", backgroundColor: "#141414" }}>
-
       {/* ── CTA card — overlap 50/50 pas di garis hijau, tinggi card otomatis (absolute + translateY -50%) ── */}
       <div style={{ position: "relative", height: 0 }}>
         <div
@@ -127,7 +126,18 @@ export default function Footer() {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", flex: "1 1 180px", minWidth: 0 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#737373", marginLeft: 12, flexShrink: 0 }} aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: "#737373", marginLeft: 12, flexShrink: 0 }}
+                    aria-hidden="true"
+                  >
                     <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
                     <rect x="2" y="4" width="20" height="16" rx="2" />
                   </svg>
@@ -168,11 +178,25 @@ export default function Footer() {
                     transition: "background-color 0.15s",
                     flex: "0 1 auto",
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#262626"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#171717"; }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#262626";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#171717";
+                  }}
                 >
                   Gabung Waitlist
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
                   </svg>
@@ -187,7 +211,7 @@ export default function Footer() {
       <div
         style={{
           position: "relative",
-          backgroundColor: "#a8d946",
+          backgroundColor: "#cdd7df",
           borderTopLeftRadius: 48,
           borderTopRightRadius: 48,
           paddingTop: halfCardHeight + 64,
@@ -207,9 +231,7 @@ export default function Footer() {
             {/* Brand */}
             <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }} aria-label="BioGasCalc beranda">
               <img src="/Logo.png" alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
-              <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#171717", lineHeight: 1 }}>
-                BioGasCalc
-              </span>
+              <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#171717", lineHeight: 1 }}>BioGasCalc</span>
             </Link>
 
             {/* Link columns */}
@@ -240,8 +262,12 @@ export default function Footer() {
                             transition: "color 0.15s",
                             display: "inline-block",
                           }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(23,23,23,0.7)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = "#171717"; }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "rgba(23,23,23,0.7)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "#171717";
+                          }}
                         >
                           {link.label}
                         </Link>

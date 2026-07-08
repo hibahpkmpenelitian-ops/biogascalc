@@ -208,8 +208,8 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
             height: 44,
             borderRadius: 9999,
             border: "none",
-            backgroundColor: loading ? "#c1ccd6" : "#00ed64",
-            color: loading ? "#7c8c9a" : "#001e2b",
+            backgroundColor: loading ? "#c1ccd6" : "#2DA44E",
+            color: loading ? "#7c8c9a" : "#ffffff",
             fontSize: "0.9375rem",
             fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
@@ -217,10 +217,10 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
             marginTop: 4,
           }}
           onMouseEnter={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#00b545";
+            if (!loading) e.currentTarget.style.backgroundColor = "#218838";
           }}
           onMouseLeave={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#00ed64";
+            if (!loading) e.currentTarget.style.backgroundColor = "#2DA44E";
           }}
         >
           {loading ? "Memproses…" : "Masuk"}

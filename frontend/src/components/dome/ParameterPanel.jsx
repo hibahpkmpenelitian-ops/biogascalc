@@ -1,10 +1,19 @@
 /* ── ParameterPanel — input form for dome parameters ────────── */
 
 const SHAPE_OPTIONS = [
-  { value: "hemisphere",    label: "Hemisphere" },
-  { value: "semiEllipsoid", label: "Semi-Ellipsoid" },
-  { value: "custom",        label: "Custom" },
+  { value: "circular",  label: "Circular" },
+  { value: "rectangle", label: "Rectangle" },
 ];
+
+const DEFAULT_PARAMS = {
+  diameter:   600,
+  height:     400,
+  length:     600,
+  width:      400,
+  wallHeight: 200,
+  slurryPct:  30,
+  shapeType:  "circular",
+};
 
 function Field({ label, unit, children }) {
   return (
@@ -22,7 +31,7 @@ function Field({ label, unit, children }) {
   );
 }
 
-function RangeInput({ value, min, max, step = 0.1, onChange }) {
+function RangeInput({ value, min, max, step = 1, onChange }) {
   return (
     <div className="flex items-center gap-3">
       <input
@@ -43,7 +52,7 @@ function RangeInput({ value, min, max, step = 0.1, onChange }) {
         value={value}
         onChange={(e) => onChange(+e.target.value)}
         style={{
-          width: 64,
+          width: 72,
           height: 36,
           textAlign: "center",
           borderRadius: 8,
@@ -63,6 +72,7 @@ function RangeInput({ value, min, max, step = 0.1, onChange }) {
 
 export default function ParameterPanel({ params, onChange }) {
   const set = (key) => (val) => onChange({ ...params, [key]: val });
+  const isRectangle = params.shapeType === "rectangle";
 
   return (
     <div
@@ -78,7 +88,7 @@ export default function ParameterPanel({ params, onChange }) {
     >
       {/* Header */}
       <div>
-        <p className="text-micro-uppercase mb-0.5" style={{ color: "#00684a" }}>
+        <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
           Parameter
         </p>
         <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#001e2b" }}>
@@ -90,7 +100,7 @@ export default function ParameterPanel({ params, onChange }) {
 
       {/* Shape type */}
       <Field label="Bentuk Dome">
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-2 gap-1.5">
           {SHAPE_OPTIONS.map((opt) => {
             const active = params.shapeType === opt.value;
             return (
@@ -116,23 +126,56 @@ export default function ParameterPanel({ params, onChange }) {
         </div>
       </Field>
 
-      {/* Diameter */}
-      <Field label="Diameter" unit="0 – 20 m">
-        <RangeInput
-          value={params.diameter}
-          min={0.5} max={20} step={0.1}
-          onChange={set("diameter")}
-        />
-      </Field>
+      {isRectangle ? (
+        <>
+          {/* Panjang */}
+          <Field label="Panjang (P)" unit="10 – 2000 cm">
+            <RangeInput
+              value={params.length}
+              min={10} max={2000} step={5}
+              onChange={set("length")}
+            />
+          </Field>
 
-      {/* Height */}
-      <Field label="Tinggi Dome" unit="0 – 15 m">
-        <RangeInput
-          value={params.height}
-          min={0.5} max={15} step={0.1}
-          onChange={set("height")}
-        />
-      </Field>
+          {/* Lebar */}
+          <Field label="Lebar (L)" unit="10 – 1500 cm">
+            <RangeInput
+              value={params.width}
+              min={10} max={1500} step={5}
+              onChange={set("width")}
+            />
+          </Field>
+
+          {/* Tinggi dinding */}
+          <Field label="Tinggi (T)" unit="10 – 1000 cm">
+            <RangeInput
+              value={params.wallHeight}
+              min={10} max={1000} step={5}
+              onChange={set("wallHeight")}
+            />
+          </Field>
+        </>
+      ) : (
+        <>
+          {/* Diameter */}
+          <Field label="Diameter" unit="50 – 2000 cm">
+            <RangeInput
+              value={params.diameter}
+              min={50} max={2000} step={5}
+              onChange={set("diameter")}
+            />
+          </Field>
+
+          {/* Height */}
+          <Field label="Tinggi Dome" unit="50 – 1500 cm">
+            <RangeInput
+              value={params.height}
+              min={50} max={1500} step={5}
+              onChange={set("height")}
+            />
+          </Field>
+        </>
+      )}
 
       {/* Slurry */}
       <Field label="Volume Slurry" unit="0 – 100 %">
@@ -164,9 +207,7 @@ export default function ParameterPanel({ params, onChange }) {
 
       {/* Reset */}
       <button
-        onClick={() =>
-          onChange({ diameter: 6, height: 4, slurryPct: 30, shapeType: "hemisphere" })
-        }
+        onClick={() => onChange(DEFAULT_PARAMS)}
         style={{
           width: "100%",
           padding: "9px 0",
@@ -188,3 +229,5 @@ export default function ParameterPanel({ params, onChange }) {
     </div>
   );
 }
+
+export { DEFAULT_PARAMS };

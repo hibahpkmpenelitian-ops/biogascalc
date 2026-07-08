@@ -27,20 +27,6 @@ export function semiEllipsoidProfile(radius, height, segments = 64) {
   return points;
 }
 
-/* Custom: lerp between hemisphere and semi-ellipsoid */
-export function customProfile(radius, height, segments = 64) {
-  const hemi   = hemisphereProfile(radius, segments);
-  const ellip  = semiEllipsoidProfile(radius, height, segments);
-  const factor = height / radius;                // > 1 → taller than hemi
-  return hemi.map((p, i) => {
-    const ex = ellip[i].x;
-    const ey = ellip[i].y;
-    const lx = THREE.MathUtils.lerp(p.x, ex, Math.min(factor - 1, 1));
-    const ly = THREE.MathUtils.lerp(p.y, ey, Math.min(factor - 1, 1));
-    return new THREE.Vector2(lx, ly);
-  });
-}
-
 /* ── Slurry cap profile ────────────────────────────────────────
    Same lathe approach but only up to slurry height.
    ------------------------------------------------------------ */
@@ -76,3 +62,4 @@ export function buildLathe(profile, phiSegments = 80) {
   if (!profile || profile.length < 2) return null;
   return new THREE.LatheGeometry(profile, phiSegments);
 }
+

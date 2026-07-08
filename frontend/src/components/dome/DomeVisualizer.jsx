@@ -1,87 +1,170 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid, Environment, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Grid, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
+
+/* ── Gradient sky dome (simple, predictable colors) ───────────*/
+function SkyDome() {
+  const material = useMemo(() => {
+    const uniforms = {
+      topColor: { value: new THREE.Color("#6fb1e8") },
+      bottomColor: { value: new THREE.Color("#dfeff5") },
+      offset: { value: 20 },
+      exponent: { value: 0.7 },
+    };
+    return new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: `
+        varying vec3 vWorldPosition;
+        void main() {
+          vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+          vWorldPosition = worldPosition.xyz;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 bottomColor;
+        uniform float offset;
+        uniform float exponent;
+        varying vec3 vWorldPosition;
+        void main() {
+          float h = normalize(vWorldPosition + vec3(0.0, offset, 0.0)).y;
+          gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+        }
+      `,
+      side: THREE.BackSide,
+    });
+  }, []);
+
+  return (
+    <mesh material={material}>
+      <sphereGeometry args={[400, 32, 15]} />
+    </mesh>
+  );
+}
 import {
   hemisphereProfile,
   semiEllipsoidProfile,
-  customProfile,
   slurryCapProfile,
   buildLathe,
 } from "../../utils/geometry";
 
 
-/* ── Dome mesh ───────────────────────────────────────────────*/
-function DomeMesh({ shapeType, radius, domeHeight }) {
+/* ── Dome mesh (circular) — solid concrete shell ───────────────*/
+function DomeMesh({ radius, domeHeight }) {
   const geometry = useMemo(() => {
-    let profile;
-    if (shapeType === "hemisphere") {
-      profile = hemisphereProfile(radius);
-    } else if (shapeType === "semiEllipsoid") {
-      profile = semiEllipsoidProfile(radius, domeHeight);
-    } else {
-      profile = customProfile(radius, domeHeight);
-    }
+    const profile = Math.abs(domeHeight - radius) < 1e-6
+      ? hemisphereProfile(radius)
+      : semiEllipsoidProfile(radius, domeHeight);
     return buildLathe(profile, 80);
-  }, [shapeType, radius, domeHeight]);
+  }, [radius, domeHeight]);
 
   if (!geometry) return null;
 
   return (
-    <mesh geometry={geometry} castShadow>
-      {/* Outer shell — dark teal, wireframe-ish transparent */}
-      <meshPhysicalMaterial
-        color="#001e2b"
-        transparent
-        opacity={0.12}
+    <mesh geometry={geometry} castShadow receiveShadow>
+      <meshStandardMaterial
+        color="#9a9691"
         side={THREE.DoubleSide}
-        roughness={0.1}
-        metalness={0.05}
-        transmission={0.6}
+        roughness={0.92}
+        metalness={0.02}
       />
     </mesh>
   );
 }
 
-/* ── Dome wireframe ──────────────────────────────────────────*/
-function DomeWireframe({ shapeType, radius, domeHeight }) {
+/* ── Rectangle dome mesh: box walls + half-cylinder roof ──────*/
+function RectangleDomeMesh({ length, width, wallHeight }) {
+  const roofRadius = width / 2;
+
+  const wallGeo = useMemo(() => {
+    if (wallHeight <= 0) return null;
+    const g = new THREE.BoxGeometry(length, wallHeight, width);
+    g.translate(0, wallHeight / 2, 0);
+    return g;
+  }, [length, width, wallHeight]);
+
+  const roofGeo = useMemo(() => {
+    const g = new THREE.CylinderGeometry(roofRadius, roofRadius, length, 48, 1, false, 0, Math.PI);
+    g.rotateZ(Math.PI / 2);
+    g.rotateY(Math.PI / 2);
+    g.translate(0, wallHeight, 0);
+    return g;
+  }, [length, roofRadius, wallHeight]);
+
+  return (
+    <group>
+      {wallGeo && (
+        <mesh geometry={wallGeo} castShadow receiveShadow>
+          <meshStandardMaterial color="#9a9691" side={THREE.DoubleSide} roughness={0.92} metalness={0.02} />
+        </mesh>
+      )}
+      <mesh geometry={roofGeo} castShadow receiveShadow>
+        <meshStandardMaterial color="#a29e98" side={THREE.DoubleSide} roughness={0.92} metalness={0.02} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── Rectangle slurry fill (straight prism up to slurryHeight) ─*/
+function RectangleSlurryMesh({ length, width, slurryHeight }) {
   const geometry = useMemo(() => {
-    let profile;
-    if (shapeType === "hemisphere") {
-      profile = hemisphereProfile(radius, 32);
-    } else if (shapeType === "semiEllipsoid") {
-      profile = semiEllipsoidProfile(radius, domeHeight, 32);
-    } else {
-      profile = customProfile(radius, domeHeight, 32);
-    }
-    return buildLathe(profile, 32);
-  }, [shapeType, radius, domeHeight]);
+    if (slurryHeight <= 0) return null;
+    const g = new THREE.BoxGeometry(length, slurryHeight, width);
+    g.translate(0, slurryHeight / 2, 0);
+    return g;
+  }, [length, width, slurryHeight]);
 
   if (!geometry) return null;
 
   return (
     <mesh geometry={geometry}>
-      <meshBasicMaterial
-        color="#00ed64"
-        wireframe
+      <meshPhysicalMaterial
+        color="#00a35c"
         transparent
-        opacity={0.18}
+        opacity={0.55}
+        roughness={0.2}
+        metalness={0}
+        side={THREE.DoubleSide}
       />
     </mesh>
   );
 }
 
-/* ── Slurry cap ──────────────────────────────────────────────*/
-function SlurryMesh({ shapeType, radius, domeHeight, slurryHeight }) {
+/* ── Rectangle slurry surface plane (top face) ────────────────*/
+function RectangleSlurrySurface({ length, width, slurryHeight }) {
+  if (slurryHeight <= 0) return null;
+  return (
+    <mesh position={[0, slurryHeight, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[length, width]} />
+      <meshPhysicalMaterial
+        color="#00ed64"
+        transparent
+        opacity={0.45}
+        roughness={0.05}
+        metalness={0.1}
+      />
+    </mesh>
+  );
+}
+
+/* ── Rectangle base plate ──────────────────────────────────────*/
+function RectangleBase({ length, width }) {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
+      <planeGeometry args={[length + 0.1, width + 0.1]} />
+      <meshBasicMaterial color="#001e2b" transparent opacity={0.15} />
+    </mesh>
+  );
+}
+
+/* ── Slurry cap (circular) ─────────────────────────────────────*/
+function SlurryMesh({ radius, domeHeight, slurryHeight }) {
   const geometry = useMemo(() => {
-    const profile = slurryCapProfile(
-      shapeType === "hemisphere" ? "hemisphere" : "semiEllipsoid",
-      radius,
-      domeHeight,
-      slurryHeight
-    );
+    const profile = slurryCapProfile("semiEllipsoid", radius, domeHeight, slurryHeight);
     return buildLathe(profile, 80);
-  }, [shapeType, radius, domeHeight, slurryHeight]);
+  }, [radius, domeHeight, slurryHeight]);
 
   if (!geometry || slurryHeight <= 0) return null;
 
@@ -99,17 +182,13 @@ function SlurryMesh({ shapeType, radius, domeHeight, slurryHeight }) {
   );
 }
 
-/* ── Slurry surface plane (top face) ─────────────────────────*/
-function SlurrySurface({ shapeType, radius, domeHeight, slurryHeight }) {
+/* ── Slurry surface plane (top face, circular) ────────────────*/
+function SlurrySurface({ radius, domeHeight, slurryHeight }) {
   const surfaceRadius = useMemo(() => {
     if (slurryHeight <= 0) return 0;
-    const r = radius;
-    if (shapeType === "hemisphere") {
-      return Math.sqrt(Math.max(0, r * r - (r - slurryHeight) ** 2));
-    }
     const a = radius, b = domeHeight > 0 ? domeHeight : radius;
     return a * Math.sqrt(Math.max(0, 1 - (slurryHeight / b) ** 2));
-  }, [shapeType, radius, domeHeight, slurryHeight]);
+  }, [radius, domeHeight, slurryHeight]);
 
   if (slurryHeight <= 0 || surfaceRadius <= 0) return null;
 
@@ -127,12 +206,22 @@ function SlurrySurface({ shapeType, radius, domeHeight, slurryHeight }) {
   );
 }
 
-/* ── Base ring (floor disc) ──────────────────────────────────*/
+/* ── Base ring (concrete footing at dome base) ────────────────*/
 function BaseRing({ radius }) {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
-      <ringGeometry args={[radius - 0.02, radius + 0.06, 80]} />
-      <meshBasicMaterial color="#001e2b" transparent opacity={0.25} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
+      <ringGeometry args={[radius - 0.05, radius + 0.15, 80]} />
+      <meshStandardMaterial color="#8a8680" roughness={0.95} />
+    </mesh>
+  );
+}
+
+/* ── Ground (grass/earth field) ───────────────────────────────*/
+function Ground() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+      <circleGeometry args={[60, 64]} />
+      <meshStandardMaterial color="#5b8a4a" roughness={1} />
     </mesh>
   );
 }
@@ -148,30 +237,19 @@ function AutoRotate({ enabled }) {
   return <group ref={ref} />;
 }
 
-/* ── Height dimension line ───────────────────────────────────*/
-function DimensionLines({ radius, domeHeight }) {
-  const maxH = domeHeight;
-
-  const lineGeo = useMemo(() => {
-    const pts = [
-      new THREE.Vector3(radius + 0.3, 0, 0),
-      new THREE.Vector3(radius + 0.3, maxH, 0),
-    ];
-    return new THREE.BufferGeometry().setFromPoints(pts);
-  }, [radius, maxH]);
-
-  return (
-    <line geometry={lineGeo}>
-      <lineBasicMaterial color="#001e2b" transparent opacity={0.3} />
-    </line>
-  );
-}
-
 /* ── Scene (inside Canvas) ───────────────────────────────────*/
 function Scene({ calc, params }) {
-  const { radius, domeHeight, slurryHeight, shape } = calc;
+  const isRectangle = calc.shape === "rectangle";
 
-  const camDistance = Math.max(radius, domeHeight) * 3.5;
+  const totalHeight = isRectangle
+    ? calc.wallHeight + calc.roofRadius
+    : calc.domeHeight;
+  const footprint = isRectangle
+    ? Math.max(calc.length, calc.width)
+    : calc.radius;
+
+  const camDistance = Math.max(footprint, totalHeight) * 3.2;
+  const shadowExtent = Math.max(footprint * 2, 6);
 
   return (
     <>
@@ -181,29 +259,57 @@ function Scene({ calc, params }) {
         fov={40}
       />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[8, 12, 6]} intensity={1.2} castShadow />
-      <directionalLight position={[-6, 4, -8]} intensity={0.4} color="#c3f0d2" />
+      <SkyDome />
+
+      <ambientLight intensity={0.55} />
+      <hemisphereLight args={["#bfd9ff", "#5b8a4a", 0.5]} />
+      <directionalLight
+        position={[footprint * 2.2, footprint * 2.8, footprint * 1.4]}
+        intensity={1.6}
+        color="#fff4dd"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-shadowExtent}
+        shadow-camera-right={shadowExtent}
+        shadow-camera-top={shadowExtent}
+        shadow-camera-bottom={-shadowExtent}
+        shadow-camera-near={0.5}
+        shadow-camera-far={footprint * 8}
+        shadow-bias={-0.0015}
+        shadow-normalBias={0.02}
+      />
+      <directionalLight position={[-footprint, footprint * 0.7, -footprint]} intensity={0.25} color="#c3d9ff" />
+
+      <Ground />
 
       <group>
-        <DomeMesh     shapeType={params.shapeType} radius={radius} domeHeight={domeHeight} />
-        <DomeWireframe shapeType={params.shapeType} radius={radius} domeHeight={domeHeight} />
-        <SlurryMesh   shapeType={params.shapeType} radius={radius} domeHeight={domeHeight} slurryHeight={slurryHeight} />
-        <SlurrySurface shapeType={params.shapeType} radius={radius} domeHeight={domeHeight} slurryHeight={slurryHeight} />
-        <BaseRing     radius={radius} />
-        <DimensionLines radius={radius} domeHeight={domeHeight} />
+        {isRectangle ? (
+          <>
+            <RectangleDomeMesh length={calc.length} width={calc.width} wallHeight={calc.wallHeight} />
+            <RectangleSlurryMesh length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
+            <RectangleSlurrySurface length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
+            <RectangleBase length={calc.length} width={calc.width} />
+          </>
+        ) : (
+          <>
+            <DomeMesh     radius={calc.radius} domeHeight={calc.domeHeight} />
+            <SlurryMesh   radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
+            <SlurrySurface radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
+            <BaseRing     radius={calc.radius} />
+          </>
+        )}
       </group>
 
       <Grid
-        position={[0, -0.01, 0]}
+        position={[0, 0.005, 0]}
         args={[30, 30]}
         cellSize={1}
-        cellThickness={0.5}
-        cellColor="#c1ccd6"
+        cellThickness={0.4}
+        cellColor="#3f5c33"
         sectionSize={5}
-        sectionThickness={1}
-        sectionColor="#a8b3bc"
-        fadeDistance={40}
+        sectionThickness={0.8}
+        sectionColor="#2f4527"
+        fadeDistance={35}
         fadeStrength={1.5}
         infiniteGrid
       />
@@ -216,7 +322,7 @@ function Scene({ calc, params }) {
         minDistance={1}
         maxDistance={60}
         maxPolarAngle={Math.PI / 2 + 0.1}
-        target={[0, domeHeight / 2, 0]}
+        target={[0, totalHeight / 2, 0]}
       />
     </>
   );
