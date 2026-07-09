@@ -1,40 +1,38 @@
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useDomeCalculations } from "../../hooks/useDomeCalculations";
+import { clampParamsToVolume } from "../../utils/volumeCap";
 import ParameterPanel, { DEFAULT_PARAMS } from "./ParameterPanel";
 import DomeVisualizer   from "./DomeVisualizer";
 import StatsPanel       from "./StatsPanel";
 import MaterialsTable    from "./MaterialsTable";
+import LockedOverlay     from "./LockedOverlay";
+import LoginModal        from "../modals/LoginModal";
+import RegisterModal     from "../modals/RegisterModal";
 
 export default function DomeCalculator() {
+  const { user } = useAuth();
+  const maxVolume = user ? 40 : 5;
+
   const [params, setParams] = useState(DEFAULT_PARAMS);
-  const calc = useDomeCalculations(params);
+  const [modal, setModal] = useState(null); // 'login' | 'register' | null
+
+  const rawCalc = useDomeCalculations(params);
+  const isCapped = rawCalc.totalVolume > maxVolume;
+  const cappedParams = isCapped ? clampParamsToVolume(params, rawCalc.totalVolume, maxVolume) : params;
+  const cappedCalc = useDomeCalculations(cappedParams);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
 
       {/* ── Title row ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
-            Rancang Dome
-          </p>
-          <h1 style={{ fontSize: "1.375rem", fontWeight: 500, color: "#001e2b" }}>
-            3D Dome Visualizer
-          </h1>
-        </div>
-        <span
-          style={{
-            fontSize: "0.8125rem",
-            padding: "4px 12px",
-            borderRadius: 9999,
-            backgroundColor: "#e3fcef",
-            border: "1px solid #c3f0d2",
-            color: "#00684a",
-            fontWeight: 500,
-          }}
-        >
-          V = {calc.totalVolume.toLocaleString("id-ID")} m³
-        </span>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
+          Rancang Dome
+        </p>
+        <h1 style={{ fontSize: "1.375rem", fontWeight: 500, color: "#001e2b" }}>
+          3D Dome Visualizer
+        </h1>
       </div>
 
       {/* ── Main layout: 2-col desktop / stack mobile ── */}
@@ -43,17 +41,35 @@ export default function DomeCalculator() {
         {/* ── LEFT: Visualizer (tall) ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div style={{ height: "clamp(360px, 55vh, 600px)" }}>
-            <DomeVisualizer calc={calc} params={params} />
+            <DomeVisualizer calc={cappedCalc} params={cappedParams} />
           </div>
           <ParameterPanel params={params} onChange={setParams} />
         </div>
 
         {/* ── RIGHT: Stats ── */}
-        <StatsPanel calc={calc} params={params} />
+        <StatsPanel
+          calc={cappedCalc}
+          params={params}
+          isCapped={isCapped}
+          maxVolume={maxVolume}
+          user={user}
+          onLoginClick={() => setModal("login")}
+        />
       </div>
 
       {/* ── Materials estimate table ── */}
-      <MaterialsTable calc={calc} params={params} />
+      <LockedOverlay
+        locked={!user}
+        onLogin={() => setModal("login")}
+        onRegister={() => setModal("register")}
+        message="Buat akun atau masuk untuk melihat estimasi bahan baku"
+      >
+        <MaterialsTable calc={cappedCalc} params={cappedParams} />
+      </LockedOverlay>
+
+      {/* ── Auth modals ── */}
+      <LoginModal open={modal === "login"} onClose={() => setModal(null)} onSwitchToRegister={() => setModal("register")} />
+      <RegisterModal open={modal === "register"} onClose={() => setModal(null)} onSwitchToLogin={() => setModal("login")} />
     </div>
   );
 }

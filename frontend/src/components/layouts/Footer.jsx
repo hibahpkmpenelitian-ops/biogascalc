@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import Aurora from "../bitspro/Aurora";
 
 /* ── Link columns ─────────────────────────────────────────── */
 const COLUMNS = [
@@ -48,7 +49,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer style={{ position: "relative", backgroundColor: "#141414" }}>
+    <footer style={{ position: "relative", backgroundColor: "transparent" }}>
       {/* ── CTA card — overlap 50/50 pas di garis hijau, tinggi card otomatis (absolute + translateY -50%) ── */}
       <div style={{ position: "relative", height: 0 }}>
         <div
@@ -72,19 +73,14 @@ export default function Footer() {
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)",
             }}
           >
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: 0,
-                backgroundImage: "url(/hero-bg.png)",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "150%",
-                filter: "brightness(1.5) blur(4px)",
-                transform: "scale(1.25)",
-              }}
-            />
+            <div aria-hidden="true" style={{ position: "absolute", inset: 0, backgroundColor: "#000000" }}>
+              <Aurora
+                colorStops={["#7cff67", "#B497CF", "#5227FF"]}
+                blend={0.5}
+                amplitude={1.0}
+                speed={1}
+              />
+            </div>
             <div
               style={{
                 position: "relative",
@@ -99,7 +95,7 @@ export default function Footer() {
               <h2
                 style={{
                   fontSize: "clamp(1.75rem, 6vw, 3.75rem)",
-                  color: "#000000",
+                  color: "#ffffff",
                   fontWeight: 500,
                   letterSpacing: "-0.025em",
                   lineHeight: 1.15,
@@ -211,7 +207,7 @@ export default function Footer() {
       <div
         style={{
           position: "relative",
-          backgroundColor: "#cdd7df",
+          backgroundColor: "#ecfdf5",
           borderTopLeftRadius: 48,
           borderTopRightRadius: 48,
           paddingTop: halfCardHeight + 64,

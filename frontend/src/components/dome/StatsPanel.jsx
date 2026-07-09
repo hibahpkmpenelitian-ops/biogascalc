@@ -46,7 +46,48 @@ function Divider({ label }) {
   );
 }
 
-export default function StatsPanel({ calc, params }) {
+function CappedNotice({ maxVolume, user, onLoginClick }) {
+  return (
+    <div
+      style={{
+        padding: "10px 14px",
+        borderRadius: 8,
+        backgroundColor: "#fff8e0",
+        border: "1px solid #f5bc2f",
+        fontSize: "0.8125rem",
+        color: "#946f3f",
+        lineHeight: 1.5,
+      }}
+    >
+      {user ? (
+        `Dibatasi ke ${maxVolume} m³`
+      ) : (
+        <>
+          {`Dibatasi ke ${maxVolume} m³ — `}
+          <button
+            type="button"
+            onClick={onLoginClick}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              color: "#946f3f",
+              fontWeight: 700,
+              textDecoration: "underline",
+              cursor: "pointer",
+              font: "inherit",
+            }}
+          >
+            Masuk
+          </button>
+          {" untuk kapasitas hingga 40 m³"}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function StatsPanel({ calc, params, isCapped, maxVolume, user, onLoginClick }) {
   const filledPct = calc.totalVolume > 0
     ? (calc.slurryVolume / calc.totalVolume) * 100
     : 0;
@@ -152,6 +193,10 @@ export default function StatsPanel({ calc, params }) {
           unit="m²"
         />
       </div>
+
+      {isCapped && (
+        <CappedNotice maxVolume={maxVolume} user={user} onLoginClick={onLoginClick} />
+      )}
 
       <Divider label="Distribusi Isi" />
 

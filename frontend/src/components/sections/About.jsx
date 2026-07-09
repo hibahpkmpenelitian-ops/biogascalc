@@ -9,7 +9,7 @@ const STATS = [
 
 export default function About() {
   return (
-    <section className="relative overflow-hidden py-24 max-[850px]:py-16 bg-emerald-50">
+    <section className="relative overflow-hidden py-24 max-[850px]:py-16 bg-white">
       {/* decorative gradient blobs */}
       <div
         aria-hidden="true"
