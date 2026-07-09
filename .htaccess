@@ -1,3 +1,3 @@
 PassengerEnabled on
 PassengerAppType node
-PassengerStartupFile backend/server.js
+PassengerStartupFile app.js
