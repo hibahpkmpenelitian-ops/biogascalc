@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dotenv = require('dotenv');
 const { syncDB } = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -12,17 +13,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'BiogasCalc API is running',
-    version: '1.0.0',
-  });
-});
-
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/domes', require('./routes/domeRoutes'));
 app.use('/api/example', require('./routes/exampleRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+
+const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(frontendPath));
+
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 app.use(errorHandler);
 
