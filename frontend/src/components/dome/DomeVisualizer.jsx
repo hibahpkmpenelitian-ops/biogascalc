@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Grid, PerspectiveCamera, Html } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ── Gradient sky dome (simple, predictable colors) ───────────*/
@@ -216,6 +216,51 @@ function BaseRing({ radius }) {
   );
 }
 
+/* ── Human scale reference (simple 2m silhouette) ─────────────*/
+function PersonScale({ x = 0, z = 0, height = 2 }) {
+  const headRadius = height * 0.065;
+  const bodyHeight = height - headRadius * 2;
+  const bodyTopRadius = height * 0.09;
+  const bodyBottomRadius = height * 0.12;
+
+  return (
+    <group position={[x, 0, z]}>
+      {/* body */}
+      <mesh position={[0, bodyHeight / 2, 0]} castShadow>
+        <cylinderGeometry args={[bodyTopRadius, bodyBottomRadius, bodyHeight, 16]} />
+        <meshStandardMaterial color="#33414d" roughness={0.8} />
+      </mesh>
+      {/* head */}
+      <mesh position={[0, bodyHeight + headRadius, 0]} castShadow>
+        <sphereGeometry args={[headRadius, 16, 16]} />
+        <meshStandardMaterial color="#33414d" roughness={0.8} />
+      </mesh>
+      {/* ground marker */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+        <circleGeometry args={[bodyBottomRadius * 1.4, 24]} />
+        <meshBasicMaterial color="#001e2b" transparent opacity={0.2} />
+      </mesh>
+      {/* height label */}
+      <Html position={[0, height + 0.25, 0]} center distanceFactor={10} occlude={false}>
+        <div
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            padding: "2px 8px",
+            borderRadius: 9999,
+            backgroundColor: "rgba(0,30,43,0.7)",
+            color: "#ffffff",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+          }}
+        >
+          {height} m
+        </div>
+      </Html>
+    </group>
+  );
+}
+
 /* ── Ground (grass/earth field) ───────────────────────────────*/
 function Ground() {
   return (
@@ -289,6 +334,7 @@ function Scene({ calc, params }) {
             <RectangleSlurryMesh length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
             <RectangleSlurrySurface length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
             <RectangleBase length={calc.length} width={calc.width} />
+            <PersonScale x={0} z={calc.width / 2 + 0.6} height={2} />
           </>
         ) : (
           <>
@@ -296,6 +342,7 @@ function Scene({ calc, params }) {
             <SlurryMesh   radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
             <SlurrySurface radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
             <BaseRing     radius={calc.radius} />
+            <PersonScale x={calc.radius + 0.6} z={0} height={2} />
           </>
         )}
       </group>

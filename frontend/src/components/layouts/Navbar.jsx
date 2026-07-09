@@ -43,7 +43,7 @@ export default function Navbar() {
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
         className="fixed left-1/2 -translate-x-1/2 w-full max-w-5xl max-[850px]:max-w-none max-[850px]:left-0 max-[850px]:translate-x-0 transition-shadow duration-200"
         style={{
           top: 10,
@@ -53,9 +53,7 @@ export default function Navbar() {
           borderTopRightRadius: 0,
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
-          boxShadow: scrolled
-            ? "rgba(0,0,0,0.25) 0px 8px 20px 0px"
-            : "rgba(0,0,0,0.2) 0px 25px 50px -12px",
+          boxShadow: scrolled ? "rgba(0,0,0,0.25) 0px 8px 20px 0px" : "rgba(0,0,0,0.2) 0px 25px 50px -12px",
         }}
       >
         {/* SVG kiri — quarter-circle notch, menempel di luar sisi kiri pill (desktop only) */}
@@ -100,9 +98,9 @@ export default function Navbar() {
           <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {/* ── KIRI: Logo + Nama ── */}
             <Link to="/" className="flex items-center gap-3" style={{ textDecoration: "none" }}>
-              <img src="/Logo.png" alt="BioGasCalc logo" className="w-8 h-8 rounded-full object-cover" style={{ border: "1px solid #2a2a2a" }} />
+              <img src="/Logo.png" alt="OWREN logo" className="w-8 h-8 rounded-full object-cover" style={{ border: "1px solid #2a2a2a" }} />
               <span className="block font-semibold tracking-tight" style={{ fontSize: "0.9375rem", color: "#ffffff", lineHeight: 1.2 }}>
-                BioGasCalc
+                Owren.tech
               </span>
             </Link>
 
@@ -200,8 +198,12 @@ export default function Navbar() {
                       lineHeight: 1.3,
                       cursor: "pointer",
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "#a8b3bc";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
                   >
                     Keluar
                   </button>
@@ -225,8 +227,12 @@ export default function Navbar() {
                       lineHeight: 1.3,
                       cursor: "pointer",
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#a8b3bc"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "#ffffff"; }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "#a8b3bc";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
                   >
                     Masuk
                   </button>
@@ -411,7 +417,11 @@ export default function Navbar() {
                     <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#001e2b" }}>{user.name}</span>
                   </div>
                   <button
-                    onClick={() => { logout(); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    onClick={() => {
+                      logout();
+                      setMobileOpen(false);
+                      document.body.style.overflow = "";
+                    }}
                     style={{
                       padding: "12px 16px",
                       borderRadius: 9999,
@@ -431,7 +441,11 @@ export default function Navbar() {
               ) : (
                 <>
                   <button
-                    onClick={() => { setModal("login"); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    onClick={() => {
+                      setModal("login");
+                      setMobileOpen(false);
+                      document.body.style.overflow = "";
+                    }}
                     style={{
                       padding: "12px 16px",
                       borderRadius: 9999,
@@ -448,7 +462,11 @@ export default function Navbar() {
                     Masuk
                   </button>
                   <button
-                    onClick={() => { setModal("register"); setMobileOpen(false); document.body.style.overflow = ""; }}
+                    onClick={() => {
+                      setModal("register");
+                      setMobileOpen(false);
+                      document.body.style.overflow = "";
+                    }}
                     style={{
                       padding: "12px 16px",
                       borderRadius: 9999,
@@ -472,16 +490,8 @@ export default function Navbar() {
       )}
 
       {/* ── Auth modals ── */}
-      <LoginModal
-        open={modal === "login"}
-        onClose={() => setModal(null)}
-        onSwitchToRegister={() => setModal("register")}
-      />
-      <RegisterModal
-        open={modal === "register"}
-        onClose={() => setModal(null)}
-        onSwitchToLogin={() => setModal("login")}
-      />
+      <LoginModal open={modal === "login"} onClose={() => setModal(null)} onSwitchToRegister={() => setModal("register")} />
+      <RegisterModal open={modal === "register"} onClose={() => setModal(null)} onSwitchToLogin={() => setModal("login")} />
     </>
   );
 }
